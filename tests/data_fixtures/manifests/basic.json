@@ -1,0 +1,9 @@
+{
+    "name": "Sample",
+    "apps": [
+        "foo",
+        "bar",
+        "ping",
+        "nope"
+    ]
+}

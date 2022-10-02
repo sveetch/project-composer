@@ -1,0 +1,2 @@
+class FooUrlsNope:
+    pass
