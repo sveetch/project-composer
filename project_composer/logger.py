@@ -6,8 +6,6 @@ Logging
 """
 import logging
 
-import colorlog
-
 from . import __pkgname__
 
 
@@ -33,15 +31,28 @@ def init_logger(name, level, printout=True):
         from io import StringIO
         dummystream = StringIO()
         handler = logging.StreamHandler(dummystream)
-    # Standard output with colored messages
+    # Standard output with optional colored messages
     else:
-        handler = logging.StreamHandler()
-        handler.setFormatter(
-            colorlog.ColoredFormatter(
-                "%(asctime)s - %(log_color)s%(message)s",
-                datefmt="%H:%M:%S"
+        try:
+            import colorlog
+        # If colorlog is not available, turn back to standard formatter
+        except ImportError:
+            handler = logging.StreamHandler()
+            handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s - %(levelname)s - %(message)s",
+                    datefmt="%H:%M:%S"
+                )
             )
-        )
+        # If colorlog is available use its formatter
+        else:
+            handler = logging.StreamHandler()
+            handler.setFormatter(
+                colorlog.ColoredFormatter(
+                    "%(asctime)s - %(log_color)s%(message)s",
+                    datefmt="%H:%M:%S"
+                )
+            )
 
     root_logger.addHandler(handler)
 

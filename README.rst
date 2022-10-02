@@ -1,5 +1,5 @@
 .. _Python: https://www.python.org/
-.. _Click: https://click.palletsprojects.com
+.. _colorlog: https://github.com/borntyping/python-colorlog
 
 ================
 Project composer
@@ -7,10 +7,13 @@ Project composer
 
 A system to compose project parts from applications enabled in a manifest.
 
+
 Dependancies
 ************
 
 * `Python`_>=3.8;
+* `colorlog`_ (optional);
+
 
 Links
 *****

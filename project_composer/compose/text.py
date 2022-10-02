@@ -26,9 +26,6 @@ class TextContentComposer(ComposerBase):
         base_output (string or pathlib.Path): Content used as the base content
             to start output. If it is given as a Path object it will be opened to
             read and use its content.
-        base_output (pathlib.Path): The path to a template file to use to create
-            content output. Content from applications text content files will be
-            appended at the file bottom.
         introduction (string): Introduction to append at the very top of content
             output. Expect a substitution pattern ``{creation_date}`` where to insert
             the current datetime in ISO format. Defaults to

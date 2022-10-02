@@ -41,6 +41,7 @@ clean-pycache:
 	rm -Rf .pytest_cache
 	find . -type d -name "__pycache__"|xargs rm -Rf
 	find . -name "*\.pyc"|xargs rm -f
+	rm -Rf .tox
 .PHONY: clean-pycache
 
 clean-install:
@@ -76,7 +77,7 @@ install: venv
 	@echo ""
 	@echo "==== Install everything for development ===="
 	@echo ""
-	$(PIP) install -e .[dev]
+	$(PIP) install -e .[colorlog,dev]
 .PHONY: install
 
 docs:

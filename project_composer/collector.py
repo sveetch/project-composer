@@ -4,12 +4,13 @@ Urls collector
 ==============
 
 """
+from .logger import LoggerBase
 
 
-class ApplicationUrlCollector:
+class ApplicationUrlCollector(LoggerBase):
     """
     Application urls collector is a class to inherit from an Application url class to
-    implement url patterns mounting.
+    create url patterns collections.
     """
     def __init__(self, settings=None):
         self.settings = settings
@@ -23,8 +24,8 @@ class ApplicationUrlCollector:
         """
         return urlpatterns
 
-    def mount(self, urlpatterns):
-        print("🎨 ApplicationUrlMounter Collecting urls")
+    def collect(self, urlpatterns):
+        self.log.debug("Application urls collector processing")
         patterns = self.load_urlpatterns(urlpatterns)
 
         # Debug
