@@ -5,6 +5,9 @@ import pytest
 from project_composer.compose import ComposerBase
 from project_composer.exceptions import ProjectComposerException
 
+# TODO:
+# It would be better to use isolation with pytester.syspathinsert to load
+# these one instead of importing in test namespace that could affect next tests
 from tests.data_fixtures.apps_structure import dummy as dummy_settings
 from tests.data_fixtures.apps_structure.foo import settings as foo_settings
 from tests.data_fixtures.apps_structure.bar import settings as bar_settings
@@ -104,8 +107,24 @@ def test_find_app_module_success():
     )
 
     module_path = composer.get_module_path("foo")
-    assert composer.find_app_module(module_path) is not None
-    assert composer.find_app_module(module_path).__name__ == module_path
+    found = composer.find_app_module(module_path)
+    assert found is not None
+    assert found.__name__ == module_path
+
+
+def test_find_app_module_success2():
+    """
+    Importation should succeed when the module is available.
+    """
+    composer = ComposerBase(
+        {"name": "Sample", "apps": []},
+        "tests.data_fixtures.apps_structure"
+    )
+
+    module_path = composer.get_module_path("foo")
+    found = composer.find_app_module(module_path)
+    assert found is not None
+    assert found.__name__ == module_path
 
 
 def test_find_app_module_invalid():

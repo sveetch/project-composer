@@ -4,6 +4,15 @@
 History
 =======
 
+Version 0.2.1 - 2022/10/04
+--------------------------
+
+* Fixed importer for some packages which add a Meta path finder in the old way (like for
+  deprecated ``imp``);
+* Added a new test around importer;
+* Removed some forgotten print usage from code;
+
+
 Version 0.2.0 - 2022/10/02
 --------------------------
 

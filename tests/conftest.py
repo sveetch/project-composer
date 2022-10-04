@@ -8,6 +8,9 @@ import pytest
 import project_composer
 
 
+pytest_plugins = "pytester"
+
+
 class FixturesSettingsTestMixin(object):
     """
     A mixin containing settings about application. This is almost only about useful

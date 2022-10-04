@@ -20,6 +20,7 @@ def import_module(name, package=None):
     inside a package.
     """
     absolute_name = importlib.util.resolve_name(name, package)
+
     try:
         return sys.modules[absolute_name]
     except KeyError:
@@ -30,10 +31,17 @@ def import_module(name, package=None):
         parent_name, _, child_name = absolute_name.rpartition('.')
         parent_module = import_module(parent_name)
         path = parent_module.__spec__.submodule_search_locations
+
     for finder in sys.meta_path:
-        spec = finder.find_spec(absolute_name, path)
-        if spec is not None:
-            break
+        # Old Meta path finders made for "imp" did not implement the "find_spec" as
+        # required with importlib
+        if hasattr(finder, "find_spec"):
+            spec = finder.find_spec(absolute_name, path)
+            # Found module from a loader use it and stop to search
+            if spec is not None:
+                break
+        else:
+            continue
     else:
         msg = f'No module named {absolute_name!r}'
         raise ModuleNotFoundError(msg, name=absolute_name)

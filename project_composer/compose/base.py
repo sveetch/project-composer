@@ -99,6 +99,12 @@ class ComposerBase(LoggerBase):
     def find_app_module(self, name):
         """
         Find a module (by its pythonpath) from application.
+
+        Arguments:
+            name (string): Module pythonpath.
+
+        Returns:
+            object: Module object if found else None.
         """
         try:
             module = import_module(name)
@@ -146,14 +152,11 @@ class ComposerBase(LoggerBase):
             list: List of elligible classes objects.
         """
         enabled = []
-        print()
 
         if not hasattr(module, "__dict__"):
             raise NotImplementedError("Module object must have a '__dict__' attribute.")
 
         for object_name in module.__dict__.keys():
-            print("  * object_name:", path, object_name)
-
             if not object_name.startswith("_"):
                 obj = getattr(module, object_name)
                 if self._is_elligible_class(obj):
