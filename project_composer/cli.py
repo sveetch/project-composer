@@ -205,10 +205,12 @@ def main():
             manifest_path,
             args.appsdir,
             base_output=base_output_path,
+            base_syspaths=args.syspath,
             **composer_kwargs
         )
 
         if args.dump:
-            print(composer.destination(Path(args.dump)))
+            msg = "Requirements file written at: {}"
+            logger.info(msg.format(composer.dump(Path(args.dump))))
         else:
             print(composer.export())

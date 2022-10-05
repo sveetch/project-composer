@@ -4,6 +4,13 @@
 History
 =======
 
+Version 0.2.3 - 2022/10/05
+--------------------------
+
+* Fixed missing syspath argument usage from CLI;
+* Fixed requirements dump from CLI;
+
+
 Version 0.2.2 - 2022/10/05
 --------------------------
 
