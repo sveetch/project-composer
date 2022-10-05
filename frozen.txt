@@ -1,4 +1,4 @@
-# Frozen requirement versions from '0.2.1' installation
+# Frozen requirement versions from '0.2.2' installation
 colorlog==6.7.0
 flake8==5.0.4
 freezegun==1.2.2

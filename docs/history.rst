@@ -4,6 +4,12 @@
 History
 =======
 
+Version 0.2.2 - 2022/10/05
+--------------------------
+
+* Fixed collector for some issues to work correctly;
+
+
 Version 0.2.1 - 2022/10/04
 --------------------------
 

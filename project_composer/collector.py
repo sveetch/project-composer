@@ -15,6 +15,8 @@ class ApplicationUrlCollector(LoggerBase):
     def __init__(self, settings=None):
         self.settings = settings
 
+        super().__init__()
+
     def load_urlpatterns(self, urlpatterns):
         """
         Method to implement by Application Url classes.
@@ -27,11 +29,5 @@ class ApplicationUrlCollector(LoggerBase):
     def collect(self, urlpatterns):
         self.log.debug("Application urls collector processing")
         patterns = self.load_urlpatterns(urlpatterns)
-
-        # Debug
-        print()
-        for item in patterns:
-            print("*", item)
-        print()
 
         return patterns
