@@ -4,6 +4,18 @@
 History
 =======
 
+Version 0.3.0 - 2022/10/11
+--------------------------
+
+* Move CLI to click instead of argparse;
+* Renamed option ``--appsdir`` to ``--repository``;
+* Renamed option ``--base`` to ``--template``;
+* Splitted CLI in subcommands, no longer need of ``--mode`` option;
+* Improved some test to be safer with importation;
+* Added ``purge`` command to definitively remove application module directory from
+  repository that are not enabled in manifest;
+
+
 Version 0.2.3 - 2022/10/05
 --------------------------
 

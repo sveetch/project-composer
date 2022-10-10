@@ -1,6 +1,8 @@
 """
 Pytest fixtures
 """
+import shutil
+
 from pathlib import Path
 
 import pytest
@@ -80,3 +82,44 @@ def settings():
                 print(settings.format("Application version: {VERSION}"))
     """
     return FixturesSettingsTestMixin()
+
+
+@pytest.fixture(scope="function")
+def install_structure(settings):
+    """
+    Install an apps structure somewhere and clean it from possible Python cache
+    dirs.
+
+    Expect argument ``destination`` as a Path object to the directory where to copy the
+    source, commonly it should be a temporary path like from Pytest fixture
+    ``tmp_path``.
+
+    A keyword argument ``source`` can be given as a Path object to the source to copy
+    into destination. If not given, this will use the directory ``apps_structure`` from
+    tests data_fixtures.
+
+    Returns Path object to created structure directory.
+
+    Example:
+        With usage like this: ::
+
+            def test_foo(install_structure):
+                foo = install_structure(
+                    Path("/home/foo/bar"),
+                    source=Path("/tmp"),
+                )
+
+        The ``bar`` directory will be copied into ``/tmp`` and ``foo`` value will be
+        ``/tmp/bar``.
+    """
+    def curry(basepath, source=None):
+        source = source or settings.fixtures_path / "apps_structure"
+        destination = basepath / source.name
+        shutil.copytree(source, destination)
+
+        for p in destination.rglob("__pycache__"):
+            shutil.rmtree(p)
+
+        return destination
+
+    return curry

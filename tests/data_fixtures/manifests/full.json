@@ -1,0 +1,12 @@
+{
+    "name": "All the application module",
+    "apps": [
+        "bar",
+        "dummy",
+        "empty",
+        "foo",
+        "invalid",
+        "ping",
+        "pong"
+    ]
+}

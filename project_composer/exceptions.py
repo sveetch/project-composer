@@ -21,3 +21,10 @@ class ComposerManifestError(ProjectComposerException):
     Error occuring when loading manifest.
     """
     pass
+
+
+class ComposerPurgeError(ProjectComposerException):
+    """
+    Error occuring when trying to purge an application repository.
+    """
+    pass

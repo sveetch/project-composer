@@ -4,13 +4,7 @@ import pytest
 
 from project_composer.compose import ComposerBase
 from project_composer.exceptions import ProjectComposerException
-
-# TODO:
-# It would be better to use isolation with pytester.syspathinsert to load
-# these one instead of importing in test namespace that could affect next tests
-from tests.data_fixtures.apps_structure import dummy as dummy_settings
-from tests.data_fixtures.apps_structure.foo import settings as foo_settings
-from tests.data_fixtures.apps_structure.bar import settings as bar_settings
+from project_composer.importer import import_module
 
 
 def test_manifest_valid(settings):
@@ -142,14 +136,22 @@ def test_find_app_module_invalid():
         assert composer.find_app_module(module_path)
 
 
-def test_get_elligible_module_classes():
+def test_get_elligible_module_classes(pytester, settings, install_structure):
     """
     All EnabledApplicationMarker inheriters from a module should be found as elligible.
     """
+    install_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
     composer = ComposerBase({"name": "Sample", "apps": []}, None)
 
+    dummy = import_module("apps_structure.dummy")
+    foo_settings = import_module("apps_structure.foo.settings")
+    bar_settings = import_module("apps_structure.bar.settings")
+
     # There is no elligible class at the root of module "foo"
-    classes = composer._get_elligible_module_classes("some.path", dummy_settings)
+    classes = composer._get_elligible_module_classes("some.path", dummy)
     assert classes == []
 
     # Foo settings have an elligible class

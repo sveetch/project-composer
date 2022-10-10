@@ -9,8 +9,8 @@ from .base import ComposerBase
 
 class ClassComposer(ComposerBase):
     """
-    Project base composer have everything to find all existing classes for enabled
-    application that match criterias from ``_is_elligible_class``.
+    Class composer find all existing classes for enabled application modules and that
+    match criterias from ``_is_elligible_class``.
     """
     def export(self):
         """
