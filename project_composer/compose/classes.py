@@ -26,7 +26,7 @@ class ClassComposer(ComposerBase):
         mods = []
         _mod_names = set([])
 
-        for name in self.apps:
+        for name in self.manifest.apps:
             path = self.get_module_path(name)
 
             # Try to find module

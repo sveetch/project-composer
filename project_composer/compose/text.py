@@ -14,58 +14,21 @@ from .base import ComposerBase
 class TextContentComposer(ComposerBase):
     """
     Text content composer assemble all text content files from enabled Applications.
-
-    Keyword Arguments:
-        application_label (string): String to start each content file block in content
-            output. It expect a substitution pattern ``{name}`` where to insert the
-            application name. Defaults to
-            ``TextContentComposer._DEFAULT_APPLICATION_LABEL`` value.
-        application_divider (string): String to add between each retrieved application
-            content file in content output. Defaults to
-            ``TextContentComposer._DEFAULT_APPLICATION_DIVIDER`` value.
-        base_output (string or pathlib.Path): Content used as the base content
-            to start output. If it is given as a Path object it will be opened to
-            read and use its content.
-        introduction (string): Introduction to append at the very top of content
-            output. Expect a substitution pattern ``{creation_date}`` where to insert
-            the current datetime in ISO format. Defaults to
-            ``TextContentComposer._DEFAULT_INTRO`` value.
     """
-    _DEFAULT_INTRO = (
-        "# This file is automatically overwritten by composer, DO NOT EDIT IT.\n"
-        "# Written on: {creation_date}\n\n"
-    )
-    _DEFAULT_CONTENT_FILENAME = "source.txt"
-    _DEFAULT_APPLICATION_LABEL = "# {name}\n"
-    _DEFAULT_APPLICATION_DIVIDER = "\n"
-
-    def __init__(self, *args, **kwargs):
-        self.application_label = kwargs.pop("application_label",
-                                            self._DEFAULT_APPLICATION_LABEL)
-        self.application_divider = kwargs.pop("application_divider",
-                                              self._DEFAULT_APPLICATION_DIVIDER)
-        self.base_output = kwargs.pop("base_output", None)
-        self.introduction = kwargs.pop("introduction", self._DEFAULT_INTRO)
-
-        super().__init__(*args, **kwargs)
-
-    def get_base_output(self, base_output=None):
+    def get_template(self, template=None):
         """
         Get the base content text where to append applications requirements.
 
         Keyword Arguments:
-            base_output (string or pathlib.Path): Content used as the base content
-                to start output. If it is given as a Path object it will be opened to
-                read and use its content.
+            template (string or pathlib.Path): Path to file of base content to start
+                output.
 
         Returns:
             string: Base content.
         """
-        if base_output:
-            if isinstance(base_output, str):
-                return base_output
-            else:
-                return base_output.read_text()
+        if template:
+            template = Path(template)
+            return template.read_text()
 
         return ""
 
@@ -78,14 +41,14 @@ class TextContentComposer(ComposerBase):
         """
         output = ""
 
-        if self.introduction:
-            output += self.introduction.format(
+        if self.manifest.requirements.introduction:
+            output += self.manifest.requirements.introduction.format(
                 creation_date=datetime.datetime.now().isoformat(timespec="seconds"),
             )
 
-        output += self.get_base_output(self.base_output)
+        output += self.get_template(self.manifest.requirements.template)
 
-        for name in self.apps:
+        for name in self.manifest.apps:
             # Try to find application module
             module_path = self.get_module_path(name)
             module = self.find_app_module(module_path)
@@ -94,7 +57,7 @@ class TextContentComposer(ComposerBase):
                 # Resolve expected text content file path inside module
                 source_path = (
                     Path(module.__file__).parents[0].resolve() /
-                    self._DEFAULT_CONTENT_FILENAME
+                    self.manifest.requirements.source_filename
                 )
                 # Try to find file from application to append its content to the output
                 if source_path.exists():
@@ -102,11 +65,12 @@ class TextContentComposer(ComposerBase):
 
                     content = source_path.read_text()
                     if content.strip():
-                        if self.application_divider:
+                        if self.manifest.requirements.application_divider:
                             output += "\n"
 
-                        if self.application_label:
-                            output += self.application_label.format(name=name)
+                        if self.manifest.requirements.application_label:
+                            label = self.manifest.requirements.application_label
+                            output += label.format(name=name)
 
                         output += content
 

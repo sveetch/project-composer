@@ -1,3 +1,7 @@
+"""
+Although these are test for base TextContentComposer, we work against
+requirements behavior since it is the only TextContentComposer implemented in Manifest.
+"""
 from freezegun import freeze_time
 
 from project_composer.compose import TextContentComposer
@@ -9,12 +13,38 @@ def test_textcontentcomposer_export_defaults():
     Content text composer with defaults arguments should export application contents
     without any errors.
     """
+    composer = TextContentComposer({
+        "name": "Sample",
+        "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+        "repository": "tests.data_fixtures.apps_structure",
+    })
+
+    output = composer.export()
+
+    assert output.splitlines() == [
+        "# This file is automatically overwritten by composer, DO NOT EDIT IT.",
+        "# Written on: 2012-10-15T10:00:00",
+        "",
+        "ping-requirements",
+        "foo-requirements",
+        "bar-requirements"
+    ]
+
+
+@freeze_time("2012-10-15 10:00:00")
+def test_textcontentcomposer_export_with_intro():
+    """
+    Content text composer with an introduction.
+    """
     composer = TextContentComposer(
         {
             "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"]
+            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "tests.data_fixtures.apps_structure",
+            "requirements": {
+                "introduction": None,
+            }
         },
-        "tests.data_fixtures.apps_structure",
     )
 
     output = composer.export()
@@ -23,94 +53,79 @@ def test_textcontentcomposer_export_defaults():
         "# This file is automatically overwritten by composer, DO NOT EDIT IT.",
         "# Written on: 2012-10-15T10:00:00",
         "",
-        "",
-        "# ping",
-        "ping-source",
-        "",
-        "# foo",
+        "ping-requirements",
         "foo-requirements",
-        "",
-        "# bar",
-        "bar-source"
+        "bar-requirements"
     ]
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_nointro():
+def test_textcontentcomposer_export_without_intro():
     """
-    Content text composer without introduction.
+    Content text composer with introduction explicitely disabled.
     """
     composer = TextContentComposer(
         {
             "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"]
+            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "tests.data_fixtures.apps_structure",
+            "requirements": {
+                "introduction": False,
+            }
         },
-        "tests.data_fixtures.apps_structure",
-        introduction=None,
     )
 
     output = composer.export()
 
     assert output.splitlines() == [
-        "",
-        "# ping",
-        "ping-source",
-        "",
-        "# foo",
+        "ping-requirements",
         "foo-requirements",
-        "",
-        "# bar",
-        "bar-source"
+        "bar-requirements"
     ]
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_with_base_string():
+def test_textcontentcomposer_export_custom_intro():
     """
-    Content text composer with a base content given as a string.
+    Content text composer with custom introduction given from a string.
     """
     composer = TextContentComposer(
         {
             "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"]
+            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "tests.data_fixtures.apps_structure",
+            "requirements": {
+                "introduction": "# Plop intro\n",
+            }
         },
-        "tests.data_fixtures.apps_structure",
-        base_output="base",
     )
 
     output = composer.export()
 
     assert output.splitlines() == [
-        "# This file is automatically overwritten by composer, DO NOT EDIT IT.",
-        "# Written on: 2012-10-15T10:00:00",
-        "",
-        "base"
-        "",
-        "# ping",
-        "ping-source",
-        "",
-        "# foo",
+        "# Plop intro",
+        "ping-requirements",
         "foo-requirements",
-        "",
-        "# bar",
-        "bar-source"
+        "bar-requirements"
     ]
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_with_base_file(settings):
+def test_textcontentcomposer_export_with_template_string(settings):
     """
-    Content text composer with a base content given as a file.
+    Content text composer with a template path given as a string.
     """
-    base_output_path = settings.fixtures_path / "requirements_template.txt"
+    template_path = settings.fixtures_path / "requirements_template.txt"
 
     composer = TextContentComposer(
         {
             "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"]
+            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "tests.data_fixtures.apps_structure",
+            "requirements": {
+                "template": str(template_path),
+            }
         },
-        "tests.data_fixtures.apps_structure",
-        base_output=base_output_path,
     )
 
     output = composer.export()
@@ -121,31 +136,28 @@ def test_textcontentcomposer_export_with_base_file(settings):
         "",
         "# Base",
         "Django",
-        "",
-        "# ping",
-        "ping-source",
-        "",
-        "# foo",
+        "ping-requirements",
         "foo-requirements",
-        "",
-        "# bar",
-        "bar-source"
+        "bar-requirements"
     ]
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_nolabel_nodivider():
+def test_textcontentcomposer_export_with_template_pathobject(settings):
     """
-    Content text composer without application label and divider.
+    Content text composer with a template path given as a Path object.
     """
+    template_path = settings.fixtures_path / "requirements_template.txt"
+
     composer = TextContentComposer(
         {
             "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"]
+            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "tests.data_fixtures.apps_structure",
+            "requirements": {
+                "template": template_path,
+            }
         },
-        "tests.data_fixtures.apps_structure",
-        application_label=None,
-        application_divider=None,
     )
 
     output = composer.export()
@@ -154,7 +166,71 @@ def test_textcontentcomposer_export_nolabel_nodivider():
         "# This file is automatically overwritten by composer, DO NOT EDIT IT.",
         "# Written on: 2012-10-15T10:00:00",
         "",
-        "ping-source",
+        "# Base",
+        "Django",
+        "ping-requirements",
         "foo-requirements",
-        "bar-source"
+        "bar-requirements"
+    ]
+
+
+@freeze_time("2012-10-15 10:00:00")
+def test_textcontentcomposer_export_with_applabel():
+    """
+    Content text composer with an application label.
+    """
+    composer = TextContentComposer(
+        {
+            "name": "Sample",
+            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "tests.data_fixtures.apps_structure",
+            "requirements": {
+                "application_label": "# {name}\n",
+            }
+        },
+    )
+
+    output = composer.export()
+
+    assert output.splitlines() == [
+        "# This file is automatically overwritten by composer, DO NOT EDIT IT.",
+        "# Written on: 2012-10-15T10:00:00",
+        "",
+        "# ping",
+        "ping-requirements",
+        "# foo",
+        "foo-requirements",
+        "# bar",
+        "bar-requirements"
+    ]
+
+
+@freeze_time("2012-10-15 10:00:00")
+def test_textcontentcomposer_export_with_divider():
+    """
+    Content text composer with an application divider.
+    """
+    composer = TextContentComposer(
+        {
+            "name": "Sample",
+            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "tests.data_fixtures.apps_structure",
+            "requirements": {
+                "application_divider": "\n",
+            }
+        },
+    )
+
+    output = composer.export()
+
+    assert output.splitlines() == [
+        "# This file is automatically overwritten by composer, DO NOT EDIT IT.",
+        "# Written on: 2012-10-15T10:00:00",
+        "",
+        "",
+        "ping-requirements",
+        "",
+        "foo-requirements",
+        "",
+        "bar-requirements"
     ]

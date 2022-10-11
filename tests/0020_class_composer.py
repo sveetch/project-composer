@@ -11,13 +11,11 @@ def test_classcomposer_export_success(caplog):
     """
     caplog.set_level(logging.DEBUG)
 
-    composer = ClassComposer(
-        {
-            "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"]
-        },
-        "tests.data_fixtures.apps_structure"
-    )
+    composer = ClassComposer({
+        "name": "Sample",
+        "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+        "repository": "tests.data_fixtures.apps_structure",
+    })
 
     # Get the class names to avoid importing module classes for assertions
     class_names = [

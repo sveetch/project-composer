@@ -1,0 +1,10 @@
+[project]
+name = "Sample"
+
+[tool.project_composer]
+apps = [
+    "foo",
+    "bar",
+    "ping",
+    "nope",
+]

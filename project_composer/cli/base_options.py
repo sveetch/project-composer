@@ -30,7 +30,8 @@ COMMON_OPTIONS = {
             "metavar": "PYTHONPATH",
             "help": (
                 "A Python path (aka: 'foo.apps') where to search for application "
-                "modules."
+                "modules. Using this argument will override the 'repository' item from"
+                "manifest."
             ),
         }
     },
@@ -44,7 +45,8 @@ COMMON_OPTIONS = {
                 "Path to a directory to add to 'sys.path' and which contains Python "
                 "modules required by some applications if not already available in the "
                 "scope of this tool. You can define it multiple times for each needed "
-                "path."
+                "path. Using this argument will append values to 'syspaths' list from "
+                "manifest."
             ),
         }
     },

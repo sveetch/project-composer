@@ -1,5 +1,7 @@
 .. _Python: https://www.python.org/
 .. _click: https://palletsprojects.com/p/click/
+.. _colorlog: https://github.com/borntyping/python-colorlog
+.. _tomli: https://github.com/hukkin/tomli
 
 ================
 Project composer
@@ -13,6 +15,8 @@ Dependancies
 
 * `Python`_>=3.8;
 * `click`_ >=8.0;
+* `colorlog`_;
+* `tomli`_;
 
 
 Links

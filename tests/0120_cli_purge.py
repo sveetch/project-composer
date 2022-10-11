@@ -86,7 +86,7 @@ def test_purge_commit_empty(pytester, caplog, tmp_path, settings, install_struct
     """
     When everything is enabled and so anything to remove.
     """
-    manifest_filename = "full.json"
+    manifest_filename = "all_apps.json"
     manifest_source = settings.fixtures_path / "manifests" / manifest_filename
 
     runner = CliRunner()
@@ -197,9 +197,9 @@ def test_purge_export(pytester, caplog, tmp_path, settings, install_structure):
 
 def test_purge_export_empty(pytester, caplog, tmp_path, settings, install_structure):
     """
-    TODO: When there was not any app module disabled
+    When everything is enabled and so anything to remove.
     """
-    manifest_filename = "full.json"
+    manifest_filename = "all_apps.json"
     manifest_source = settings.fixtures_path / "manifests" / manifest_filename
 
     runner = CliRunner()

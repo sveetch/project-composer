@@ -4,6 +4,24 @@
 History
 =======
 
+Version 0.4.0 - 2022/10/15
+--------------------------
+
+**New Manifest system bring backward incompatible changes**
+
+* Fixed Makefile install since colorlog is no longer an optional dependency;
+* Update tox config to remove colorlog switch and to avoid installing documentation and
+  release stuff;
+* Added Manifest model to store manifest datas;
+* Added ``tomli`` dependency to add TOML format support for manifest;
+* Requirements settings are now a part of manifest;
+* Composer classes no longer accept options from args or kwargs, everything is driven
+  by Manifest. However commandlines are able to override manifest options from
+  arguments;
+* RequirementsComposer have been removed since it has no meaning anymore, the
+  'requirements' commandline just directly use TextContentComposer;
+
+
 Version 0.3.0 - 2022/10/11
 --------------------------
 

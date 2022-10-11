@@ -4,13 +4,12 @@ Base composer
 =============
 
 """
-import json
 import sys
 import inspect
 
-from ..exceptions import ComposerManifestError
 from ..importer import import_module
 from ..logger import LoggerBase
+from ..manifest import Manifest
 
 
 class ComposerBase(LoggerBase):
@@ -19,14 +18,21 @@ class ComposerBase(LoggerBase):
     manifest loading.
 
     Arguments:
-        manifest_path (pathlib.Path or dict): Either a path to the manifest file to load
-            or directly the manifest dictionnary.
-        appsdir_pythonpath (string): Python path where to search for application
-            modules.
+        manifest (string or pathlib.Path or dict or Manifest): The Manifest source to
+            load. It can be either:
+
+            * A Manifest object, it will just returned as it without any validation,
+                you are responsible of its correctness;
+            * A string for the file path to load in JSON or TOML format;
+            * A Path object to the file to load in JSON or TOML format;
+            * A Dictionnary which respect the manifest structure;
+
+            Source file format are guessed from their file extension such as JSON
+            for ``.json`` or TOML for ``.toml``.
 
     Keyword Arguments:
-        base_syspaths (list): A list of path to insert in sys.path, this is required if
-            ``appsdir_pythonpath`` is not available directly in the current working
+        syspaths (list): A list of path to insert in sys.path, this is required if
+            ``repository`` module is not available directly in the current working
             directory. You are responsible to no set twice paths, erroneous paths, etc..
             There is no validation for the paths you give.
 
@@ -37,20 +43,12 @@ class ComposerBase(LoggerBase):
     """
     _MODULE_PYTHONPATH = "{parent}.{name}"
 
-    def __init__(self, manifest_path, appsdir_pythonpath, **kwargs):
-        self.base_syspaths = None
-        if "base_syspaths" in kwargs:
-            self.base_syspaths = kwargs.pop("base_syspaths")
-
-        self.manifest_path = manifest_path
-        self.appsdir_pythonpath = appsdir_pythonpath
-
+    def __init__(self, manifest, **kwargs):
         super().__init__()
 
-        self.manifest = self.get_manifest(self.manifest_path)
-        self.apps = self.manifest["apps"]
+        self.manifest = Manifest.load(manifest)
 
-        for item in (self.base_syspaths or []):
+        for item in (self.manifest.syspaths or []):
             sys.path.append(item)
 
     def get_module_path(self, name):
@@ -61,40 +59,16 @@ class ComposerBase(LoggerBase):
             name (string): Module name.
 
         Returns:
-            string: Module name prefixed with ``ComposerBase.appsdir_pythonpath`` if
-            it is not empty else returns just the module name.
+            string: Module name prefixed with repository path if it is not empty else
+            returns just the module name.
         """
-        if self.appsdir_pythonpath:
+        if self.manifest.repository:
             return self._MODULE_PYTHONPATH.format(
-                parent=self.appsdir_pythonpath,
+                parent=self.manifest.repository,
                 name=name,
             )
 
         return name
-
-    def get_manifest(self, path):
-        """
-        Load manifest from JSON file, validate it and return it as Python object.
-
-        Arguments:
-            path (pathlib.Path or dict): Either a path to the manifest file to load
-                or directly the manifest dictionnary.
-
-        Returns:
-            dict: The manifest.
-        """
-        if isinstance(path, dict):
-            content = path
-        else:
-            content = json.loads(path.read_text())
-
-        if not isinstance(content, dict):
-            raise ComposerManifestError("Manifest content should be a dictionnary.")
-
-        if "apps" not in content:
-            raise ComposerManifestError("Manifest require an item 'apps'.")
-
-        return content
 
     def find_app_module(self, name):
         """

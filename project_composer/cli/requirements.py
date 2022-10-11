@@ -5,7 +5,8 @@ import click
 
 from .. import __pkgname__
 
-from ..compose import RequirementsComposer
+from ..compose import TextContentComposer
+from ..manifest import Manifest
 
 from .base_options import COMMON_OPTIONS
 
@@ -44,53 +45,66 @@ from .base_options import COMMON_OPTIONS
     ),
 )
 @click.option(
-    "--minimal",
-    is_flag=True,
+    "--applabel",
+    default=None,
+    metavar="STRING",
     help=(
-        "Forces all documents to be be parsed in buffered mode instead "
-        "of streaming mode (causes some parse errors to be treated as "
-        "non-fatal document errors instead of as fatal document errors)."
+        "A string to add the application name before its requirements. The name will "
+        "be added in expected pattern '{name}' Remember to finish you string with a"
+        "newline character.."
+    ),
+)
+@click.option(
+    "--appdivider",
+    default=None,
+    metavar="STRING",
+    help=(
+        "String to add between application. Commonly used to insert a new line. "
+        "By default there is no divider."
+    ),
+)
+@click.option(
+    "--introduction",
+    default=None,
+    metavar="STRING",
+    help=(
+        "Introduction string to start output. Accept a pattern '{creation_date}' to "
+        "include the current date. Give an empty string to disable introduction. If "
+        "argument is not defined a default introduction is included with a WARNING "
+        "and the date."
     ),
 )
 @click.pass_context
 def requirements_command(context, manifest, repository, syspath, template, dump,
-                         minimal):
+                         applabel, appdivider, introduction):
     """
     Output composed requirements from applications.
     """
     logger = logging.getLogger(__pkgname__)
 
-    composer_kwargs = {}
-
     logger.debug("Using manifest: {}".format(manifest))
+    manifest = Manifest.load(manifest)
 
-    if repository:
-        logger.debug("Applications repository: {}".format(repository))
+    # Override some manifest options from arguments
+    if repository is not None:
+        manifest.repository = repository
+    if syspath is not None:
+        manifest.syspaths.extend(syspath)
 
-    for item in syspath:
+    if manifest.repository:
+        logger.debug("Applications repository: {}".format(manifest.repository))
+
+    for item in manifest.syspaths:
         logger.debug("Loading in sys.path: {}".format(item))
 
     if template:
         logger.debug("Using template: {}".format(template))
+        manifest.template = template
 
     if dump:
         logger.debug("Dump destination: {}".format(dump))
 
-    if minimal:
-        logger.debug("Minimalist output enabled")
-        composer_kwargs.update({
-            "application_label": None,
-            "application_divider": None,
-            "introduction": None,
-        })
-
-    composer = RequirementsComposer(
-        manifest,
-        repository,
-        base_output=template,
-        base_syspaths=syspath,
-        **composer_kwargs
-    )
+    composer = TextContentComposer(manifest)
 
     if dump:
         msg = "Requirements file written at: {}"

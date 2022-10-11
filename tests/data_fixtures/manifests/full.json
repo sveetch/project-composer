@@ -1,12 +1,20 @@
 {
-    "name": "All the application module",
+    "name": "Full manifest options",
     "apps": [
         "bar",
         "dummy",
         "empty",
         "foo",
-        "invalid",
         "ping",
-        "pong"
-    ]
+        "pong",
+        "nope"
+    ],
+    "requirements": {
+        "template": "requirements_template.txt",
+        "dump": "output.txt",
+        "minimal": true,
+        "application_label": "# {name}\n",
+        "application_divider": "\n",
+        "introduction": false
+    }
 }

@@ -1,0 +1,21 @@
+[project]
+name = "Full manifest options"
+
+[tool.project_composer]
+apps = [
+    "bar",
+    "dummy",
+    "empty",
+    "foo",
+    "ping",
+    "pong",
+    "nope",
+]
+
+[tool.project_composer.requirements]
+template = "requirements_template.txt"
+dump = "output.txt"
+minimal = true
+application_label = "# {name}\n"
+application_divider = "\n"
+introduction = false

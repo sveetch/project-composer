@@ -3,7 +3,6 @@ from .classes import ClassComposer
 from .text import TextContentComposer
 from .django import ComposeDjangoSettings, ComposeDjangoUrls
 from .purge import PurgeApplications
-from .requirements import RequirementsComposer
 
 
 __all__ = [
@@ -13,5 +12,4 @@ __all__ = [
     "ComposeDjangoSettings",
     "ComposeDjangoUrls",
     "PurgeApplications",
-    "RequirementsComposer",
 ]

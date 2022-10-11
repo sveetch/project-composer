@@ -1,63 +1,46 @@
-import json
-
 import pytest
 
 from project_composer.compose import ComposerBase
-from project_composer.exceptions import ProjectComposerException
 from project_composer.importer import import_module
+from project_composer.manifest import Manifest
 
 
-def test_manifest_valid(settings):
+def test_manifest_valid_file(settings):
     """
     Valid manifest file should load without errors
     """
     manifest_path = settings.fixtures_path / "manifests" / "basic.json"
 
-    # Expected content from basic manifest, also used for the "direct manifest
-    # dictionnary" way for manifest_path argument.
-    manifest = {
-        "name": "Sample",
-        "apps": [
-            "foo",
-            "bar",
-            "ping",
-            "nope"
-        ]
-    }
+    composer = ComposerBase(manifest_path)
 
-    composer = ComposerBase(manifest_path, None)
+    assert composer.manifest.name == "Sample"
+    assert composer.manifest.apps == [
+        "foo",
+        "bar",
+        "ping",
+        "nope"
+    ]
 
-    assert composer.manifest == manifest
 
+def test_manifest_valid_model(settings):
     # Directly give a dictionnary instead of a path
-    composer = ComposerBase(manifest, None)
-    assert composer.manifest == manifest
+    manifest = Manifest("Sample", [
+        "foo",
+        "bar",
+        "ping",
+        "nope"
+    ])
+    composer = ComposerBase(manifest)
+    assert composer.manifest.name == "Sample"
+    assert composer.manifest.apps == [
+        "foo",
+        "bar",
+        "ping",
+        "nope"
+    ]
 
 
-def test_manifest_invalid_syntax(settings):
-    """
-    Invalid syntax should raise a JSON error
-    """
-    manifest_path = settings.fixtures_path / "manifests" / "invalid_syntax.json"
-
-    with pytest.raises(json.decoder.JSONDecodeError):
-        ComposerBase(manifest_path, None)
-
-
-def test_manifest_invalid_format(settings):
-    """
-    Invalid format should raise a custom exception
-    """
-    manifest_path = settings.fixtures_path / "manifests" / "invalid_format.json"
-
-    with pytest.raises(ProjectComposerException):
-        ComposerBase(manifest_path, None)
-
-    with pytest.raises(ProjectComposerException):
-        ComposerBase({"nope": True}, None)
-
-
-@pytest.mark.parametrize("appsdir_pythonpath, name, expected", [
+@pytest.mark.parametrize("repository, name, expected", [
     (
         None,
         "bar",
@@ -69,15 +52,16 @@ def test_manifest_invalid_format(settings):
         "foo.bar",
     ),
 ])
-def test_get_module_path(appsdir_pythonpath, name, expected):
+def test_get_module_path(repository, name, expected):
     """
     Method should return the right expected path depending composer attribute
-    'appsdir_pythonpath' value.
+    'repository' value.
     """
-    composer = ComposerBase(
-        {"name": "Sample", "apps": []},
-        appsdir_pythonpath
-    )
+    composer = ComposerBase({
+        "name": "Sample",
+        "apps": [],
+        "repository": repository,
+    })
     assert composer.get_module_path(name) == expected
 
 
@@ -85,7 +69,10 @@ def test_find_app_module_notfound():
     """
     Importation should fail without exception but still emit a warning log
     """
-    composer = ComposerBase({"name": "Sample", "apps": []}, None)
+    composer = ComposerBase({
+        "name": "Sample",
+        "apps": [],
+    })
 
     module_path = composer.get_module_path("foo")
     assert composer.find_app_module(module_path) is None
@@ -95,10 +82,11 @@ def test_find_app_module_success():
     """
     Importation should succeed when the module is available.
     """
-    composer = ComposerBase(
-        {"name": "Sample", "apps": []},
-        "tests.data_fixtures.apps_structure"
-    )
+    composer = ComposerBase({
+        "name": "Sample",
+        "apps": [],
+        "repository": "tests.data_fixtures.apps_structure",
+    })
 
     module_path = composer.get_module_path("foo")
     found = composer.find_app_module(module_path)
@@ -110,10 +98,11 @@ def test_find_app_module_success2():
     """
     Importation should succeed when the module is available.
     """
-    composer = ComposerBase(
-        {"name": "Sample", "apps": []},
-        "tests.data_fixtures.apps_structure"
-    )
+    composer = ComposerBase({
+        "name": "Sample",
+        "apps": [],
+        "repository": "tests.data_fixtures.apps_structure",
+    })
 
     module_path = composer.get_module_path("foo")
     found = composer.find_app_module(module_path)
@@ -125,10 +114,11 @@ def test_find_app_module_invalid():
     """
     Invalid module still raises exception because it must be explicit.
     """
-    composer = ComposerBase(
-        {"name": "Sample", "apps": []},
-        "tests.data_fixtures.apps_structure"
-    )
+    composer = ComposerBase({
+        "name": "Sample",
+        "apps": [],
+        "repository": "tests.data_fixtures.apps_structure",
+    })
 
     module_path = composer.get_module_path("invalid")
 
@@ -144,7 +134,7 @@ def test_get_elligible_module_classes(pytester, settings, install_structure):
 
     pytester.syspathinsert(pytester.path)
 
-    composer = ComposerBase({"name": "Sample", "apps": []}, None)
+    composer = ComposerBase({"name": "Sample", "apps": []})
 
     dummy = import_module("apps_structure.dummy")
     foo_settings = import_module("apps_structure.foo.settings")

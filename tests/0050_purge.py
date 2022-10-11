@@ -21,9 +21,9 @@ def test_purge_export_success(pytester, caplog, settings, install_structure):
     purger = PurgeApplications(
         {
             "name": "Sample",
-            "apps": ["ping", "foo"]
+            "apps": ["ping", "foo"],
+            "repository": "apps_structure",
         },
-        "apps_structure"
     )
 
     # Get the class names to avoid importing module classes for assertions
@@ -47,9 +47,9 @@ def test_purge_export_fail(pytester, caplog):
     purger = PurgeApplications(
         {
             "name": "Sample",
-            "apps": ["ping", "foo"]
+            "apps": ["ping", "foo"],
+            "repository": "not_importable_dummy_repository_module_path",
         },
-        "not_importable_dummy_repository_module_path"
     )
 
     with pytest.raises(ComposerPurgeError):
@@ -70,9 +70,9 @@ def test_purge_commit(pytester, caplog, settings, install_structure):
     purger = PurgeApplications(
         {
             "name": "Sample",
-            "apps": ["ping", "foo"]
+            "apps": ["ping", "foo"],
+            "repository": "apps_structure",
         },
-        "apps_structure"
     )
 
     purger.commit()

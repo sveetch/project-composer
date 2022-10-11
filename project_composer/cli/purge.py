@@ -5,6 +5,7 @@ import click
 from .. import __pkgname__
 
 from ..compose import PurgeApplications
+from ..manifest import Manifest
 
 from .base_options import COMMON_OPTIONS
 
@@ -43,21 +44,24 @@ def purge_command(context, manifest, repository, syspath, commit):
     logger = logging.getLogger(__pkgname__)
 
     logger.debug("Using manifest: {}".format(manifest))
+    manifest = Manifest.load(manifest)
 
-    if repository:
-        logger.debug("Applications repository: {}".format(repository))
+    # Override some manifest options from arguments
+    if repository is not None:
+        manifest.repository = repository
+    if syspath is not None:
+        manifest.syspaths.extend(syspath)
+
+    if manifest.repository:
+        logger.debug("Applications repository: {}".format(manifest.repository))
     else:
         logger.critical("Applications repository is required.")
         raise click.Abort()
 
-    for item in syspath:
+    for item in manifest.syspaths:
         logger.debug("Loading in sys.path: {}".format(item))
 
-    composer = PurgeApplications(
-        manifest,
-        repository,
-        base_syspaths=syspath,
-    )
+    composer = PurgeApplications(manifest)
 
     if commit:
         to_remove = composer.commit()

@@ -28,10 +28,10 @@ class PurgeApplications(ComposerBase):
             list: A list of Path objects.
         """
         try:
-            repository = import_module(self.appsdir_pythonpath)
+            repository = import_module(self.manifest.repository)
         except ModuleNotFoundError:
             msg = "Unable to find application repository module: {}"
-            raise ComposerPurgeError(msg.format(self.appsdir_pythonpath))
+            raise ComposerPurgeError(msg.format(self.manifest.repository))
 
         repository_path = Path(repository.__file__).parent
 
@@ -47,7 +47,7 @@ class PurgeApplications(ComposerBase):
         return [
             item
             for item in appdirs
-            if item.name not in self.apps
+            if item.name not in self.manifest.apps
         ]
 
     def commit(self):

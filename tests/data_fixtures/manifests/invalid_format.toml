@@ -1,0 +1,5 @@
+[project]
+name = "Invalid TOML format"
+
+[tool.project_composer]
+nope = "niet"

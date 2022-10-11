@@ -7,6 +7,8 @@ from freezegun import freeze_time
 
 from project_composer import __pkgname__
 from project_composer.cli.entrypoint import cli_frontend
+from project_composer.utils.tests import debug_invoke
+from project_composer.manifest import Manifest
 
 
 def test_requirements_manifest_opt_fail(caplog):
@@ -28,7 +30,8 @@ def test_requirements_basic(pytester, caplog, tmp_path, settings, install_struct
     """
     With proper manifest value, the command should succeed to run.
     """
-    manifest_source = settings.fixtures_path / "manifests" / "basic.json"
+    manifest_filename = "basic.json"
+    manifest_source = settings.fixtures_path / "manifests" / manifest_filename
 
     runner = CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
@@ -37,7 +40,7 @@ def test_requirements_basic(pytester, caplog, tmp_path, settings, install_struct
         # Install sample structure into temp dir
         install_structure(test_cwd)
         # Copy manifest sample into temp dir
-        manifest_path = test_cwd / "basic.json"
+        manifest_path = test_cwd / manifest_filename
         manifest_path.write_text(manifest_source.read_text())
         # Append temporary repository path to sys.path during test execution
         pytester.syspathinsert(test_cwd)
@@ -46,24 +49,15 @@ def test_requirements_basic(pytester, caplog, tmp_path, settings, install_struct
 
         result = runner.invoke(cli_frontend, [
             "requirements",
-            "--manifest", "basic.json",
+            "--manifest", manifest_filename,
             "--repository", "apps_structure",
             "--dump", dump_path,
         ])
 
+        debug_invoke(result, caplog)
+
         # Get the written dump content
         output = dump_path.read_text().splitlines()
-
-        # print("=> result.output <=")
-        # print(result.output)
-        # print()
-        # print("=> caplog.record_tuples <=")
-        # print(caplog.record_tuples)
-        # print()
-        # print("=> result.exception <=")
-        # print(result.exception)
-        # if result.exception:
-        #     raise result.exception
 
         assert result.exit_code == 0
 
@@ -71,12 +65,71 @@ def test_requirements_basic(pytester, caplog, tmp_path, settings, install_struct
             "# This file is automatically overwritten by composer, DO NOT EDIT IT.",
             "# Written on: 2012-10-15T10:00:00",
             "",
-            "",
-            "# foo",
             "foo-requirements",
+            "bar-requirements",
+            "ping-requirements"
+        ]
+
+        assert caplog.record_tuples == [
+            (
+                __pkgname__,
+                logging.WARNING,
+                "Unable to find module: apps_structure.nope"
+            ),
+        ]
+
+
+@freeze_time("2012-10-15 10:00:00")
+def test_requirements_full(pytester, caplog, tmp_path, settings, install_structure):
+    """
+    With proper manifest value, the command should succeed to run.
+    """
+    manifest_filename = "full.json"
+    manifest_source = settings.fixtures_path / "manifests" / manifest_filename
+
+    runner = CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        test_cwd = Path(td)
+
+        # Install sample structure into temp dir
+        install_structure(test_cwd)
+        # Copy manifest sample into temp dir
+        manifest_path = test_cwd / manifest_filename
+        manifest_path.write_text(manifest_source.read_text())
+        # Load manifest to be able to read some of its values
+        manifest = Manifest.load(manifest_path)
+        # Copy template from manifest into temp dir
+        template_source = settings.fixtures_path / manifest.requirements.template
+        template_path = test_cwd / manifest.requirements.template
+        template_path.write_text(template_source.read_text())
+        # Append temporary repository path to sys.path during test execution
+        pytester.syspathinsert(test_cwd)
+
+        dump_path = test_cwd / "full.txt"
+
+        result = runner.invoke(cli_frontend, [
+            "requirements",
+            "--manifest", manifest_filename,
+            "--repository", "apps_structure",
+            "--dump", dump_path,
+        ])
+
+        debug_invoke(result, caplog)
+
+        # Get the written dump content
+        output = dump_path.read_text().splitlines()
+
+        assert result.exit_code == 0
+
+        assert output == [
+            "# Base",
+            "Django",
             "",
             "# bar",
             "bar-requirements",
+            "",
+            "# foo",
+            "foo-requirements",
             "",
             "# ping",
             "ping-requirements"
