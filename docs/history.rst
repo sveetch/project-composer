@@ -4,6 +4,14 @@
 History
 =======
 
+Version 0.4.2 - 2022/10/16
+--------------------------
+
+* Changed default manifest filename to ``pyproject.toml``;
+* Changed commandlines so they automatically and correctly manage command arguments to
+  override manifest arguments;
+
+
 Version 0.4.1 - 2022/10/16
 --------------------------
 

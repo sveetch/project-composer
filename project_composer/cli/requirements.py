@@ -21,8 +21,8 @@ from .base_options import COMMON_OPTIONS
     **COMMON_OPTIONS["repository"]["kwargs"]
 )
 @click.option(
-    *COMMON_OPTIONS["syspath"]["args"],
-    **COMMON_OPTIONS["syspath"]["kwargs"]
+    *COMMON_OPTIONS["syspaths"]["args"],
+    **COMMON_OPTIONS["syspaths"]["kwargs"]
 )
 @click.option(
     "--template",
@@ -46,6 +46,7 @@ from .base_options import COMMON_OPTIONS
 )
 @click.option(
     "--applabel",
+    "application_label",
     default=None,
     metavar="STRING",
     help=(
@@ -56,6 +57,7 @@ from .base_options import COMMON_OPTIONS
 )
 @click.option(
     "--appdivider",
+    "application_divider",
     default=None,
     metavar="STRING",
     help=(
@@ -76,6 +78,7 @@ from .base_options import COMMON_OPTIONS
 )
 @click.option(
     "--source",
+    "source_filename",
     default=None,
     metavar="STRING",
     help=(
@@ -83,29 +86,24 @@ from .base_options import COMMON_OPTIONS
     ),
 )
 @click.pass_context
-def requirements_command(context, manifest, repository, syspath, template, dump,
-                         applabel, appdivider, introduction, source):
+def requirements_command(*args, **parameters):
     """
     Output composed requirements from applications.
     """
     logger = logging.getLogger(__pkgname__)
 
-    logger.debug("Using manifest: {}".format(manifest))
-    manifest = Manifest.load(manifest)
+    # Load manifest settings
+    logger.debug("Using manifest: {}".format(parameters["manifest"]))
+    manifest = Manifest.load(parameters["manifest"])
 
-    # Override some manifest options from arguments
-    if repository is not None:
-        manifest.repository = repository
-    if syspath is not None:
-        manifest.syspaths.extend(syspath)
-    if template:
-        manifest.requirements.template = template
-    if source:
-        manifest.requirements.source_filename = source
-    if appdivider:
-        manifest.requirements.application_divider = appdivider
-    if applabel:
-        manifest.requirements.application_label = applabel
+    # Override base manifest settings from given arguments
+    for name in manifest.get_fields():
+        if name != "requirements" and parameters.get(name) is not None:
+            setattr(manifest, name, parameters.get(name))
+    # The same for requirements plugin
+    for name in manifest.requirements.get_fields():
+        if parameters.get(name) is not None:
+            setattr(manifest.requirements, name, parameters.get(name))
 
     # Logging used settings
     if manifest.repository:
@@ -114,15 +112,16 @@ def requirements_command(context, manifest, repository, syspath, template, dump,
     for item in manifest.syspaths:
         logger.debug("Loading in sys.path: {}".format(item))
 
-    logger.debug("Using template: {}".format(template))
-    logger.debug("Using source filename: {}".format(template))
-
-    if dump:
-        logger.debug("Dump destination: {}".format(dump))
+    logger.debug("Using template: {}".format(manifest.requirements.template))
+    logger.debug("Using source filename: {}".format(
+        manifest.requirements.source_filename)
+    )
 
     composer = TextContentComposer(manifest)
 
+    dump = parameters.get("dump")
     if dump:
+        logger.debug("Dump destination: {}".format(dump))
         msg = "Requirements file written at: {}"
         logger.debug(msg.format(
             composer.dump(dump)

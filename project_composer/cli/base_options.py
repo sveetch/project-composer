@@ -35,8 +35,8 @@ COMMON_OPTIONS = {
             ),
         }
     },
-    "syspath": {
-        "args": ("--syspath",),
+    "syspaths": {
+        "args": ("--syspath", "syspaths"),
         "kwargs": {
             "default": [],
             "multiple": True,
@@ -45,7 +45,7 @@ COMMON_OPTIONS = {
                 "Path to a directory to add to 'sys.path' and which contains Python "
                 "modules required by some applications if not already available in the "
                 "scope of this tool. You can define it multiple times for each needed "
-                "path. Using this argument will append values to 'syspaths' list from "
+                "path. Using this argument will override the 'syspaths' value from "
                 "manifest."
             ),
         }

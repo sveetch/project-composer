@@ -200,6 +200,7 @@ def test_requirements_override(pytester, caplog, tmp_path, settings, install_str
         assert result.exit_code == 0
 
         assert output == [
+            "// Intro",
             "# Base",
             "Django",
             "//-",
