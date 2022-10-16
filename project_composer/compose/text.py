@@ -66,7 +66,7 @@ class TextContentComposer(ComposerBase):
                     content = source_path.read_text()
                     if content.strip():
                         if self.manifest.requirements.application_divider:
-                            output += "\n"
+                            output += self.manifest.requirements.application_divider
 
                         if self.manifest.requirements.application_label:
                             label = self.manifest.requirements.application_label

@@ -1,5 +1,5 @@
 {
-    "name": "Full manifest options",
+    "name": "Full manifest JSON",
     "apps": [
         "bar",
         "dummy",
@@ -9,10 +9,9 @@
         "pong",
         "nope"
     ],
+    "repository": "apps_structure",
     "requirements": {
         "template": "requirements_template.txt",
-        "dump": "output.txt",
-        "minimal": true,
         "application_label": "# {name}\n",
         "application_divider": "\n",
         "introduction": false

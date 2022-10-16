@@ -1,5 +1,6 @@
 {
     "name": "Sample",
+    "repository": "apps_structure",
     "apps": [
         "foo",
         "bar",

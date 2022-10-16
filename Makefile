@@ -98,7 +98,7 @@ flake:
 	@echo ""
 	@echo "==== Flake ===="
 	@echo ""
-	$(FLAKE) --show-source $(APPLICATION_NAME) tests
+	$(FLAKE) --statistics --show-source $(APPLICATION_NAME) tests
 .PHONY: flake
 
 test:

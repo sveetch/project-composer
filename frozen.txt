@@ -1,4 +1,4 @@
-# Frozen requirement versions from '0.4.0' installation
+# Frozen requirement versions from '0.4.1' installation
 click==8.1.3
 colorlog==6.7.0
 flake8==5.0.4

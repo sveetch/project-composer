@@ -2,6 +2,7 @@
 name = "Sample"
 
 [tool.project_composer]
+repository = "apps_structure"
 apps = [
     "foo",
     "bar",

@@ -4,6 +4,13 @@
 History
 =======
 
+Version 0.4.1 - 2022/10/16
+--------------------------
+
+This release ensure any settings can be managed from Manifest and that commandlines
+can override Manifest settings.
+
+
 Version 0.4.0 - 2022/10/15
 --------------------------
 

@@ -1,5 +1,5 @@
 [project]
-name = "Full manifest options"
+name = "Full manifest TOML"
 
 [tool.project_composer]
 apps = [
@@ -11,11 +11,10 @@ apps = [
     "pong",
     "nope",
 ]
+repository = "apps_structure"
 
 [tool.project_composer.requirements]
 template = "requirements_template.txt"
-dump = "output.txt"
-minimal = true
 application_label = "# {name}\n"
 application_divider = "\n"
 introduction = false

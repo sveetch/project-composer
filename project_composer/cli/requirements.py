@@ -74,9 +74,17 @@ from .base_options import COMMON_OPTIONS
         "and the date."
     ),
 )
+@click.option(
+    "--source",
+    default=None,
+    metavar="STRING",
+    help=(
+        "Filename to search in application module to find requirements."
+    ),
+)
 @click.pass_context
 def requirements_command(context, manifest, repository, syspath, template, dump,
-                         applabel, appdivider, introduction):
+                         applabel, appdivider, introduction, source):
     """
     Output composed requirements from applications.
     """
@@ -90,16 +98,24 @@ def requirements_command(context, manifest, repository, syspath, template, dump,
         manifest.repository = repository
     if syspath is not None:
         manifest.syspaths.extend(syspath)
+    if template:
+        manifest.requirements.template = template
+    if source:
+        manifest.requirements.source_filename = source
+    if appdivider:
+        manifest.requirements.application_divider = appdivider
+    if applabel:
+        manifest.requirements.application_label = applabel
 
+    # Logging used settings
     if manifest.repository:
         logger.debug("Applications repository: {}".format(manifest.repository))
 
     for item in manifest.syspaths:
         logger.debug("Loading in sys.path: {}".format(item))
 
-    if template:
-        logger.debug("Using template: {}".format(template))
-        manifest.template = template
+    logger.debug("Using template: {}".format(template))
+    logger.debug("Using source filename: {}".format(template))
 
     if dump:
         logger.debug("Dump destination: {}".format(dump))
