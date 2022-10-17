@@ -1,7 +1,7 @@
 {
     "name": "Sample",
-    "repository": "apps_structure",
-    "apps": [
+    "repository": "basic_structure",
+    "collection": [
         "foo",
         "bar",
         "ping",

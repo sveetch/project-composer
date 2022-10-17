@@ -8,15 +8,19 @@ from project_composer.compose import TextContentComposer
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_defaults():
+def test_textcontentcomposer_export_defaults(pytester, basic_structure):
     """
     Content text composer with defaults arguments should export application contents
     without any errors.
     """
+    basic_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
     composer = TextContentComposer({
         "name": "Sample",
-        "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
-        "repository": "tests.data_fixtures.apps_structure",
+        "collection": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+        "repository": "basic_structure",
     })
 
     output = composer.export()
@@ -32,15 +36,19 @@ def test_textcontentcomposer_export_defaults():
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_with_intro():
+def test_textcontentcomposer_export_with_intro(pytester, basic_structure):
     """
     Content text composer with an introduction.
     """
+    basic_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
     composer = TextContentComposer(
         {
             "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
-            "repository": "tests.data_fixtures.apps_structure",
+            "collection": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "basic_structure",
             "requirements": {
                 "introduction": None,
             }
@@ -60,17 +68,21 @@ def test_textcontentcomposer_export_with_intro():
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_without_intro():
+def test_textcontentcomposer_export_without_intro(pytester, basic_structure):
     """
     Content text composer with introduction explicitely disabled.
     """
+    basic_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
     composer = TextContentComposer(
         {
             "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
-            "repository": "tests.data_fixtures.apps_structure",
+            "collection": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "basic_structure",
             "requirements": {
-                "introduction": False,
+                "introduction": "",
             }
         },
     )
@@ -85,15 +97,19 @@ def test_textcontentcomposer_export_without_intro():
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_custom_intro():
+def test_textcontentcomposer_export_custom_intro(pytester, basic_structure):
     """
     Content text composer with custom introduction given from a string.
     """
+    basic_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
     composer = TextContentComposer(
         {
             "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
-            "repository": "tests.data_fixtures.apps_structure",
+            "collection": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "basic_structure",
             "requirements": {
                 "introduction": "# Plop intro\n",
             }
@@ -111,17 +127,22 @@ def test_textcontentcomposer_export_custom_intro():
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_with_template_string(settings):
+def test_textcontentcomposer_export_with_template_string(pytester, settings,
+                                                         basic_structure):
     """
     Content text composer with a template path given as a string.
     """
+    basic_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
     template_path = settings.fixtures_path / "requirements_template.txt"
 
     composer = TextContentComposer(
         {
             "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
-            "repository": "tests.data_fixtures.apps_structure",
+            "collection": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "basic_structure",
             "requirements": {
                 "template": str(template_path),
             }
@@ -143,47 +164,19 @@ def test_textcontentcomposer_export_with_template_string(settings):
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_with_template_pathobject(settings):
-    """
-    Content text composer with a template path given as a Path object.
-    """
-    template_path = settings.fixtures_path / "requirements_template.txt"
-
-    composer = TextContentComposer(
-        {
-            "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
-            "repository": "tests.data_fixtures.apps_structure",
-            "requirements": {
-                "template": template_path,
-            }
-        },
-    )
-
-    output = composer.export()
-
-    assert output.splitlines() == [
-        "# This file is automatically overwritten by composer, DO NOT EDIT IT.",
-        "# Written on: 2012-10-15T10:00:00",
-        "",
-        "# Base",
-        "Django",
-        "ping-requirements",
-        "foo-requirements",
-        "bar-requirements"
-    ]
-
-
-@freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_with_applabel():
+def test_textcontentcomposer_export_with_applabel(pytester, basic_structure):
     """
     Content text composer with an application label.
     """
+    basic_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
     composer = TextContentComposer(
         {
             "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
-            "repository": "tests.data_fixtures.apps_structure",
+            "collection": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "basic_structure",
             "requirements": {
                 "application_label": "# {name}\n",
             }
@@ -206,15 +199,19 @@ def test_textcontentcomposer_export_with_applabel():
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_textcontentcomposer_export_with_divider():
+def test_textcontentcomposer_export_with_divider(pytester, basic_structure):
     """
     Content text composer with an application divider.
     """
+    basic_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
     composer = TextContentComposer(
         {
             "name": "Sample",
-            "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
-            "repository": "tests.data_fixtures.apps_structure",
+            "collection": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+            "repository": "basic_structure",
             "requirements": {
                 "application_divider": "\n",
             }

@@ -1,0 +1,12 @@
+[
+    {
+        "name": "foo",
+        "dependencies": [],
+        "push_end": false
+    },
+    {
+        "name": "bar",
+        "dependencies": [],
+        "push_end": false
+    }
+]

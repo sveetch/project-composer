@@ -1,6 +1,6 @@
 {
     "name": "Sample",
-    "apps": [
+    "collection": [
         "foo",
         "bar",
         "ping",

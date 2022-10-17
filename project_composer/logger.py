@@ -1,9 +1,3 @@
-"""
-=======
-Logging
-=======
-
-"""
 import logging
 
 from . import __pkgname__

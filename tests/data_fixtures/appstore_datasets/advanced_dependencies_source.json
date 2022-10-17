@@ -1,0 +1,47 @@
+[
+    {
+        "name": "cms",
+        "dependencies": [
+            "editor",
+            "filer"
+        ]
+    },
+    {
+        "name": "django"
+    },
+    {
+        "name": "forms"
+    },
+    {
+        "name": "filer",
+        "dependencies": [
+            "forms"
+        ]
+    },
+    {
+        "name": "editor",
+        "dependencies": [
+            "forms"
+        ]
+    },
+    {
+        "name": "blog",
+        "dependencies": [
+            "filer",
+            "editor"
+        ]
+    },
+    {
+        "name": "rest",
+        "dependencies": [
+            "forms"
+        ]
+    },
+    {
+        "name": "cms_blog",
+        "dependencies": [
+            "cms",
+            "blog"
+        ]
+    }
+]

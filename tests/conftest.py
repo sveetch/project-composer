@@ -84,8 +84,7 @@ def settings():
     return FixturesSettingsTestMixin()
 
 
-@pytest.fixture(scope="function")
-def install_structure(settings):
+def install_structure(basepath, source):
     """
     Install an apps structure somewhere and clean it from possible Python cache
     dirs.
@@ -95,16 +94,30 @@ def install_structure(settings):
     ``tmp_path``.
 
     A keyword argument ``source`` can be given as a Path object to the source to copy
-    into destination. If not given, this will use the directory ``apps_structure`` from
+    into destination. If not given, this will use the directory ``basic_structure`` from
     tests data_fixtures.
 
     Returns Path object to created structure directory.
+    """
+    destination = basepath / source.name
+    shutil.copytree(source, destination)
+
+    for p in destination.rglob("__pycache__"):
+        shutil.rmtree(p)
+
+    return destination
+
+
+@pytest.fixture(scope="function")
+def basic_structure(settings):
+    """
+    Shortcut fixture around "install_structure()" to use "basic_structure" directory.
 
     Example:
         With usage like this: ::
 
-            def test_foo(install_structure):
-                foo = install_structure(
+            def test_foo(basic_structure):
+                foo = basic_structure(
                     Path("/home/foo/bar"),
                     source=Path("/tmp"),
                 )
@@ -112,14 +125,34 @@ def install_structure(settings):
         The ``bar`` directory will be copied into ``/tmp`` and ``foo`` value will be
         ``/tmp/bar``.
     """
-    def curry(basepath, source=None):
-        source = source or settings.fixtures_path / "apps_structure"
-        destination = basepath / source.name
-        shutil.copytree(source, destination)
+    def curry(basepath):
+        source = settings.fixtures_path / "basic_structure"
 
-        for p in destination.rglob("__pycache__"):
-            shutil.rmtree(p)
+        return install_structure(basepath, source)
 
-        return destination
+    return curry
+
+
+@pytest.fixture(scope="function")
+def advanced_structure(settings):
+    """
+    Shortcut fixture around "install_structure()" to use "advanced_structure" directory.
+
+    Example:
+        With usage like this: ::
+
+            def test_foo( directory):
+                foo =  directory(
+                    Path("/home/foo/bar"),
+                    source=Path("/tmp"),
+                )
+
+        The ``bar`` directory will be copied into ``/tmp`` and ``foo`` value will be
+        ``/tmp/bar``.
+    """
+    def curry(basepath):
+        source = settings.fixtures_path / "advanced_structure"
+
+        return install_structure(basepath, source)
 
     return curry

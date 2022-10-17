@@ -1,5 +1,7 @@
 .. _Python: https://www.python.org/
 .. _click: https://palletsprojects.com/p/click/
+.. _colorlog: https://github.com/borntyping/python-colorlog
+.. _tomli: https://github.com/hukkin/tomli
 
 .. project-composer documentation master file, created by David Thenon
 
@@ -7,7 +9,11 @@
 Project composer
 ================
 
-A system to compose project parts from applications enabled in a manifest.
+This is a Python modular project composer.
+
+Basically, you will give a project manifest to the composer that will use it to
+organize your various project parts. Parts can be classes, text files or you can
+implement another part backend.
 
 
 Dependancies
@@ -15,6 +21,8 @@ Dependancies
 
 * `Python`_>=3.8;
 * `click`_ >=8.0;
+* `colorlog`_;
+* `tomli`_;
 
 
 Links
@@ -31,6 +39,7 @@ User’s Guide
 .. toctree::
    :maxdepth: 2
 
+   overview.rst
    install.rst
    cli.rst
    core/index.rst

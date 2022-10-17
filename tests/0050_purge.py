@@ -7,22 +7,22 @@ from project_composer.compose import PurgeApplications
 from project_composer.exceptions import ComposerPurgeError
 
 
-def test_purge_export_success(pytester, caplog, settings, install_structure):
+def test_purge_export_success(pytester, caplog, settings, basic_structure):
     """
     Purge export should return every Path object for module directories to remove
     from applications repository
     """
     caplog.set_level(logging.DEBUG)
 
-    install_structure(pytester.path)
+    basic_structure(pytester.path)
 
     pytester.syspathinsert(pytester.path)
 
     purger = PurgeApplications(
         {
             "name": "Sample",
-            "apps": ["ping", "foo"],
-            "repository": "apps_structure",
+            "collection": ["ping", "foo"],
+            "repository": "basic_structure",
         },
     )
 
@@ -34,7 +34,18 @@ def test_purge_export_success(pytester, caplog, settings, install_structure):
 
     assert sorted(dirnames) == ["bar", "dummy", "empty", "invalid", "pong"]
 
-    assert caplog.record_tuples == []
+    assert caplog.record_tuples == [
+        (
+            __pkgname__,
+            logging.DEBUG,
+            "PurgeApplications found application at: basic_structure.ping"
+        ),
+        (
+            __pkgname__,
+            logging.DEBUG,
+            "PurgeApplications found application at: basic_structure.foo"
+        )
+    ]
 
 
 def test_purge_export_fail(pytester, caplog):
@@ -47,7 +58,7 @@ def test_purge_export_fail(pytester, caplog):
     purger = PurgeApplications(
         {
             "name": "Sample",
-            "apps": ["ping", "foo"],
+            "collection": ["ping", "foo"],
             "repository": "not_importable_dummy_repository_module_path",
         },
     )
@@ -56,22 +67,22 @@ def test_purge_export_fail(pytester, caplog):
         purger.export()
 
 
-def test_purge_commit(pytester, caplog, settings, install_structure):
+def test_purge_commit(pytester, caplog, settings, basic_structure):
     """
     Purge commit should remove every module directories in repository that are not
     enabled applications from manifest.
     """
     caplog.set_level(logging.DEBUG)
 
-    structure = install_structure(pytester.path)
+    structure = basic_structure(pytester.path)
 
     pytester.syspathinsert(pytester.path)
 
     purger = PurgeApplications(
         {
             "name": "Sample",
-            "apps": ["ping", "foo"],
-            "repository": "apps_structure",
+            "collection": ["ping", "foo"],
+            "repository": "basic_structure",
         },
     )
 
@@ -88,27 +99,37 @@ def test_purge_commit(pytester, caplog, settings, install_structure):
     assert caplog.record_tuples == [
         (
             __pkgname__,
-            logging.INFO,
-            "Removing application module: {}/bar".format(structure),
+            logging.DEBUG,
+            "PurgeApplications found application at: basic_structure.ping"
+        ),
+        (
+            __pkgname__,
+            logging.DEBUG,
+            "PurgeApplications found application at: basic_structure.foo"
         ),
         (
             __pkgname__,
             logging.INFO,
-            "Removing application module: {}/pong".format(structure),
+            "PurgeApplications is removing application: {}/bar".format(structure)
         ),
         (
             __pkgname__,
             logging.INFO,
-            "Removing application module: {}/invalid".format(structure),
+            "PurgeApplications is removing application: {}/pong".format(structure)
         ),
         (
             __pkgname__,
             logging.INFO,
-            "Removing application module: {}/dummy".format(structure),
+            "PurgeApplications is removing application: {}/invalid".format(structure)
         ),
         (
             __pkgname__,
             logging.INFO,
-            "Removing application module: {}/empty".format(structure),
+            "PurgeApplications is removing application: {}/dummy".format(structure)
         ),
+        (
+            __pkgname__,
+            logging.INFO,
+            "PurgeApplications is removing application: {}/empty".format(structure)
+        )
     ]

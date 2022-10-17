@@ -2,19 +2,23 @@ import json
 
 import pytest
 
-from project_composer.exceptions import ComposerManifestError
+from project_composer.exceptions import ComposerManifestError, ComposerConfigError
 from project_composer.manifest import RequirementsConfig, Manifest
 
 
 def test_manifest_to_dict():
     """
     Manifest object should correctly dump all its field values to a dictionnary.
+
+    TODO: to_dict depends from BaseConfig move it to its test file.
     """
     manifest = Manifest(
-        "foo",
-        ["bar"],
+        name="foo",
+        collection=["bar"],
         repository="plop.plip",
         syspaths=["flip", "flop", "flip"],
+        default_store_app="base",
+        no_ordering=False,
         requirements=RequirementsConfig(
             application_label="label",
             application_divider="div",
@@ -28,8 +32,10 @@ def test_manifest_to_dict():
 
     assert content == {
         "name": "foo",
-        "apps": ["bar"],
+        "collection": ["bar"],
         "repository": "plop.plip",
+        "default_store_app": "base",
+        "no_ordering": False,
         "syspaths": [
             "flip",
             "flop",
@@ -45,7 +51,7 @@ def test_manifest_to_dict():
     }
 
 
-def test_manifest_load_invalid_format(pytester, settings):
+def test_manifest_load_unknow_format(pytester, settings):
     """
     Manifest filepath must have the right extension to guess its format
     """
@@ -67,30 +73,36 @@ def test_manifest_load_invalid_json_syntax(settings):
         Manifest.load(manifest_source)
 
 
-@pytest.mark.parametrize("manifest_filename, expected", [
+@pytest.mark.parametrize("manifest_filename, exception, expected", [
     (
         "invalid_format.json",
-        "Manifest 'apps' option is a required item and must be a list",
+        ComposerConfigError,
+        "Field 'collection' is required from 'Manifest'",
     ),
     (
         "invalid_format.toml",
-        "Manifest 'apps' option is a required item and must be a list",
+        ComposerConfigError,
+        "Field 'collection' is required from 'Manifest'",
     ),
     (
         "invalid_pyproject.toml",
-        "TOML manifest must have a section",
+        ComposerManifestError,
+        (
+            "TOML manifest must have a section [tool.project_composer] to fill base "
+            "options."
+        ),
     ),
 ])
-def test_manifest_load_invalid_json_format(settings, manifest_filename, expected):
+def test_manifest_load_invalid_format(settings, manifest_filename, exception, expected):
     """
-    Invalid syntax should raise a JSON error
+    Invalid syntax should raise a manifest error
     """
     manifest_source = settings.fixtures_path / "manifests" / manifest_filename
 
-    with pytest.raises(ComposerManifestError) as exc_info:
+    with pytest.raises(exception) as exc_info:
         Manifest.load(manifest_source)
 
-    assert exc_info.value.args[0].startswith(expected) is True
+    assert exc_info.value.args[0] == expected
 
 
 @pytest.mark.parametrize("manifest_filename, expected", [
@@ -98,14 +110,16 @@ def test_manifest_load_invalid_json_format(settings, manifest_filename, expected
         "basic.json",
         {
             "name": "Sample",
-            "apps": [
+            "collection": [
                 "foo",
                 "bar",
                 "ping",
                 "nope",
             ],
-            "repository": "apps_structure",
+            "repository": "basic_structure",
             "syspaths": [],
+            "default_store_app": None,
+            "no_ordering": False,
             "requirements": {
                 "application_label": None,
                 "application_divider": None,
@@ -119,14 +133,16 @@ def test_manifest_load_invalid_json_format(settings, manifest_filename, expected
         "basic.toml",
         {
             "name": "Sample",
-            "apps": [
+            "collection": [
                 "foo",
                 "bar",
                 "ping",
                 "nope",
             ],
-            "repository": "apps_structure",
+            "repository": "basic_structure",
             "syspaths": [],
+            "default_store_app": None,
+            "no_ordering": False,
             "requirements": {
                 "application_label": None,
                 "application_divider": None,
@@ -140,7 +156,7 @@ def test_manifest_load_invalid_json_format(settings, manifest_filename, expected
         "full.json",
         {
             "name": "Full manifest JSON",
-            "apps": [
+            "collection": [
                 "bar",
                 "dummy",
                 "empty",
@@ -149,12 +165,14 @@ def test_manifest_load_invalid_json_format(settings, manifest_filename, expected
                 "pong",
                 "nope",
             ],
-            "repository": "apps_structure",
-            "syspaths": [],
+            "repository": "basic_structure",
+            "syspaths": ["container"],
+            "default_store_app": "foo",
+            "no_ordering": False,
             "requirements": {
                 "application_label": "# {name}\n",
                 "application_divider": "\n",
-                "introduction": None,
+                "introduction": "",
                 "source_filename": RequirementsConfig._DEFAULT_CONTENT_FILENAME,
                 "template": "requirements_template.txt",
             }
@@ -164,7 +182,7 @@ def test_manifest_load_invalid_json_format(settings, manifest_filename, expected
         "full.toml",
         {
             "name": "Full manifest TOML",
-            "apps": [
+            "collection": [
                 "bar",
                 "dummy",
                 "empty",
@@ -173,12 +191,14 @@ def test_manifest_load_invalid_json_format(settings, manifest_filename, expected
                 "pong",
                 "nope",
             ],
-            "repository": "apps_structure",
-            "syspaths": [],
+            "repository": "basic_structure",
+            "syspaths": ["container"],
+            "default_store_app": "foo",
+            "no_ordering": False,
             "requirements": {
                 "application_label": "# {name}\n",
                 "application_divider": "\n",
-                "introduction": None,
+                "introduction": "",
                 "source_filename": RequirementsConfig._DEFAULT_CONTENT_FILENAME,
                 "template": "requirements_template.txt",
             }

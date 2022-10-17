@@ -2,8 +2,8 @@
 name = "Sample"
 
 [tool.project_composer]
-repository = "apps_structure"
-apps = [
+repository = "basic_structure"
+collection = [
     "foo",
     "bar",
     "ping",

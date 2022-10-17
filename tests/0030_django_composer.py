@@ -1,15 +1,19 @@
 from project_composer.compose import ComposeDjangoSettings, ComposeDjangoUrls
 
 
-def test_composedjangosettings_export_success():
+def test_composedjangosettings_export_success(pytester, basic_structure):
     """
     Should behaves like Class composer but specifically for application settings
     modules.
     """
+    basic_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
     composer = ComposeDjangoSettings({
         "name": "Sample",
-        "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
-        "repository": "tests.data_fixtures.apps_structure",
+        "collection": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+        "repository": "basic_structure",
     })
 
     # Get the class names to avoid importing module classes for assertions
@@ -23,15 +27,19 @@ def test_composedjangosettings_export_success():
     ]
 
 
-def test_composedjangourls_export_success():
+def test_composedjangourls_export_success(pytester, basic_structure):
     """
     Should behaves like Class composer but specifically for application urls
     modules.
     """
+    basic_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
     composer = ComposeDjangoUrls({
         "name": "Sample",
-        "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
-        "repository": "tests.data_fixtures.apps_structure",
+        "collection": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+        "repository": "basic_structure",
     })
 
     # Get the class names to avoid importing module classes for assertions

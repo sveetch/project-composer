@@ -4,17 +4,21 @@ from project_composer import __pkgname__
 from project_composer.compose import ClassComposer
 
 
-def test_classcomposer_export_success(caplog):
+def test_classcomposer_export_success(caplog, pytester, basic_structure):
     """
     Class composer should export all elligible classes from enable apps from manifest
     and conserve the class definition order.
     """
     caplog.set_level(logging.DEBUG)
 
+    basic_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
     composer = ClassComposer({
         "name": "Sample",
-        "apps": ["ping", "pong", "foo", "dummy", "empty", "bar"],
-        "repository": "tests.data_fixtures.apps_structure",
+        "collection": ["ping", "pong", "foo", "dummy", "empty", "bar"],
+        "repository": "basic_structure",
     })
 
     # Get the class names to avoid importing module classes for assertions
@@ -29,51 +33,81 @@ def test_classcomposer_export_success(caplog):
         (
             __pkgname__,
             logging.DEBUG,
-            "Found application module at: tests.data_fixtures.apps_structure.ping"
+            "ClassComposer found application at: basic_structure.ping"
         ),
         (
             __pkgname__,
             logging.DEBUG,
-            "Found application module at: tests.data_fixtures.apps_structure.pong"
+            "ClassComposer found application at: basic_structure.pong"
         ),
         (
             __pkgname__,
             logging.DEBUG,
-            "Found application module at: tests.data_fixtures.apps_structure.foo"
+            "ClassComposer found application at: basic_structure.foo"
         ),
         (
             __pkgname__,
             logging.DEBUG,
-            "Got enabled class at: tests.data_fixtures.apps_structure.foo.FooPlopInit"
+            "ClassComposer found application at: basic_structure.dummy"
         ),
         (
             __pkgname__,
             logging.DEBUG,
-            "Got enabled class at: tests.data_fixtures.apps_structure.foo.FooPlapInit"
+            "ClassComposer found application at: basic_structure.empty"
         ),
         (
             __pkgname__,
             logging.DEBUG,
-            "Found application module at: tests.data_fixtures.apps_structure.dummy"
+            "ClassComposer found application at: basic_structure.bar"
         ),
         (
             __pkgname__,
             logging.DEBUG,
-            "Found application module at: tests.data_fixtures.apps_structure.empty"
+            "ClassComposer found module at: basic_structure.ping"
         ),
         (
             __pkgname__,
             logging.DEBUG,
-            "Found application module at: tests.data_fixtures.apps_structure.bar"
+            "ClassComposer found module at: basic_structure.pong"
         ),
         (
             __pkgname__,
             logging.DEBUG,
-            "Got enabled class at: tests.data_fixtures.apps_structure.bar.BarPlopInit"
+            "ClassComposer found module at: basic_structure.foo"
         ),
         (
             __pkgname__,
             logging.DEBUG,
-            "Got enabled class at: tests.data_fixtures.apps_structure.bar.BarPlapInit"
+            "ClassComposer found enabled Class at: basic_structure.foo.FooPlopInit"
+        ),
+        (
+            __pkgname__,
+            logging.DEBUG,
+            "ClassComposer found enabled Class at: basic_structure.foo.FooPlapInit"
+        ),
+        (
+            __pkgname__,
+            logging.DEBUG,
+            "ClassComposer found module at: basic_structure.dummy"
+        ),
+        (
+            __pkgname__,
+            logging.DEBUG,
+            "ClassComposer found module at: basic_structure.empty"
+        ),
+        (
+            __pkgname__,
+            logging.DEBUG,
+            "ClassComposer found module at: basic_structure.bar"
+        ),
+        (
+            __pkgname__,
+            logging.DEBUG,
+            "ClassComposer found enabled Class at: basic_structure.bar.BarPlopInit"
+        ),
+        (
+            __pkgname__,
+            logging.DEBUG,
+            "ClassComposer found enabled Class at: basic_structure.bar.BarPlapInit"
         )
     ]

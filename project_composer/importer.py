@@ -1,8 +1,4 @@
 """
-=============
-Module import
-=============
-
 Convenient way to programmatically import a module from a Python path.
 
 """

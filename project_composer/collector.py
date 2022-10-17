@@ -1,9 +1,3 @@
-"""
-==============
-Urls collector
-==============
-
-"""
 from .logger import LoggerBase
 
 

@@ -2,7 +2,7 @@
 name = "Full manifest TOML"
 
 [tool.project_composer]
-apps = [
+collection = [
     "bar",
     "dummy",
     "empty",
@@ -11,10 +11,15 @@ apps = [
     "pong",
     "nope",
 ]
-repository = "apps_structure"
+repository = "basic_structure"
+syspaths = [
+    "container",
+]
+default_store_app = "foo"
+no_ordering = false
 
 [tool.project_composer.requirements]
 template = "requirements_template.txt"
 application_label = "# {name}\n"
 application_divider = "\n"
-introduction = false
+introduction = ""

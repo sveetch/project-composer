@@ -1,9 +1,3 @@
-"""
-==============
-Class composer
-==============
-
-"""
 from .base import ComposerBase
 
 
@@ -26,14 +20,17 @@ class ClassComposer(ComposerBase):
         mods = []
         _mod_names = set([])
 
-        for name in self.manifest.apps:
-            path = self.get_module_path(name)
+        for node in self.apps:
+            path = self.get_module_path(node.name)
 
             # Try to find module
             module = self.find_app_module(path)
             if module:
-                # Resolve expected requirements file path inside module
-                self.log.debug("Found application module at: {}".format(path))
+                msg = "{klass} found module at: {path}".format(
+                    klass=self.__class__.__name__,
+                    path=path,
+                )
+                self.log.debug(msg)
 
                 mods.extend([
                     item

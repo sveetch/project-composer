@@ -1,10 +1,3 @@
-"""
-================
-Inspector marker
-================
-
-"""
-
 
 class EnabledApplicationMarker:
     """

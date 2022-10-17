@@ -1,0 +1,33 @@
+[
+    {
+        "name": "ping",
+        "dependencies": [],
+        "push_end": false
+    },
+    {
+        "name": "foo",
+        "dependencies": [],
+        "push_end": true
+    },
+    {
+        "name": "bar",
+        "dependencies": [
+            "foo"
+        ],
+        "push_end": true
+    },
+    {
+        "name": "pong",
+        "dependencies": [
+            "ping"
+        ],
+        "push_end": true
+    },
+    {
+        "name": "pang",
+        "dependencies": [
+            "pong"
+        ],
+        "push_end": true
+    }
+]

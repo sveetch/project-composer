@@ -1,10 +1,3 @@
-"""
-=================
-Default constants
-=================
-
-"""
-
 
 # Default manifest filepath
 DEFAULT_MANIFEST_PATH = "pyproject.toml"

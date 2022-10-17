@@ -1,0 +1,4 @@
+DEPENDENCIES = [
+    "cms",
+    "blog"
+]

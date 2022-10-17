@@ -1,0 +1,12 @@
+[
+    {
+        "name": "zip",
+        "push_end": true
+    },
+    {
+        "name": "foo"
+    },
+    {
+        "name": "bar"
+    }
+]

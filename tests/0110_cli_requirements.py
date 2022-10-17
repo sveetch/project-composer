@@ -1,4 +1,12 @@
+"""
+.. NOTE:
+    As requirements commandline is the only one to implement every possible manifest
+    settings and CLI arguments, these tests also make global coverage against CLI and
+    its manifest usage.
+"""
 import logging
+import shutil
+import sys
 from pathlib import Path
 
 import pytest
@@ -9,8 +17,9 @@ from freezegun import freeze_time
 
 from project_composer import __pkgname__
 from project_composer.cli.entrypoint import cli_frontend
-from project_composer.utils.tests import debug_invoke
+# from project_composer.utils.tests import debug_invoke
 from project_composer.manifest import Manifest
+from project_composer.compose import TextContentComposer
 
 
 def test_requirements_manifest_opt_fail(caplog):
@@ -32,7 +41,7 @@ def test_requirements_manifest_opt_fail(caplog):
     "basic.json",
     "basic.toml",
 ])
-def test_requirements_basic(pytester, caplog, tmp_path, settings, install_structure,
+def test_requirements_basic(pytester, caplog, tmp_path, settings, basic_structure,
                             manifest_filename):
     """
     With proper manifest values, the command should succeed to run.
@@ -44,10 +53,10 @@ def test_requirements_basic(pytester, caplog, tmp_path, settings, install_struct
         test_cwd = Path(td)
 
         # Install sample structure into temp dir
-        install_structure(test_cwd)
+        basic_structure(test_cwd)
         # Copy manifest sample into temp dir
         manifest_path = test_cwd / manifest_filename
-        manifest_path.write_text(manifest_source.read_text())
+        shutil.copyfile(manifest_source, manifest_path)
         # Append temporary repository path to sys.path during test execution
         pytester.syspathinsert(test_cwd)
 
@@ -56,11 +65,11 @@ def test_requirements_basic(pytester, caplog, tmp_path, settings, install_struct
         result = runner.invoke(cli_frontend, [
             "requirements",
             "--manifest", manifest_filename,
-            "--repository", "apps_structure",
+            "--repository", "basic_structure",
             "--dump", dump_path,
         ])
 
-        debug_invoke(result, caplog)
+        # debug_invoke(result, caplog)
 
         # Get the written dump content
         output = dump_path.read_text().splitlines()
@@ -80,9 +89,23 @@ def test_requirements_basic(pytester, caplog, tmp_path, settings, install_struct
             (
                 __pkgname__,
                 logging.WARNING,
-                "Unable to find module: apps_structure.nope"
+                "TextContentComposer is unable to find module: basic_structure.nope"
             ),
         ]
+
+
+def mocked_composer_set_syspaths(pytester_instance):
+    """
+    A function to use to mockup the BaseComposer.set_syspaths to pytester.syspathinsert
+
+    This return a curried function that have been given the pytester instance.
+    """
+    def curry(obj, paths):
+        for path in paths:
+            if path not in sys.path:
+                pytester_instance.syspathinsert(path)
+
+    return curry
 
 
 @pytest.mark.parametrize("manifest_filename", [
@@ -90,8 +113,8 @@ def test_requirements_basic(pytester, caplog, tmp_path, settings, install_struct
     "full.toml",
 ])
 @freeze_time("2012-10-15 10:00:00")
-def test_requirements_full(pytester, caplog, tmp_path, settings, install_structure,
-                           manifest_filename):
+def test_requirements_full(monkeypatch, pytester, caplog, tmp_path, settings,
+                           basic_structure, manifest_filename):
     """
     With proper manifest value, the command should succeed to run.
     """
@@ -99,21 +122,33 @@ def test_requirements_full(pytester, caplog, tmp_path, settings, install_structu
 
     runner = CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        # Enforce composer to use pytester.syspathinsert
+        monkeypatch.setattr(
+            TextContentComposer,
+            "set_syspaths",
+            mocked_composer_set_syspaths(pytester)
+        )
+
         test_cwd = Path(td)
 
+        # Full manifest use a container directory for the repository so we can test
+        # about syspath but it does not exists from structure so we create it on the fly
+        container = test_cwd / "container"
+        container.mkdir(mode=0o777)
+
         # Install sample structure into temp dir
-        install_structure(test_cwd)
+        basic_structure(container)
         # Copy manifest sample into temp dir
         manifest_path = test_cwd / manifest_filename
-        manifest_path.write_text(manifest_source.read_text())
+        shutil.copyfile(manifest_source, manifest_path)
         # Load manifest to be able to read some of its values
         manifest = Manifest.load(manifest_path)
         # Copy template from manifest into temp dir
-        template_source = settings.fixtures_path / manifest.requirements.template
         template_path = test_cwd / manifest.requirements.template
-        template_path.write_text(template_source.read_text())
-        # Append temporary repository path to sys.path during test execution
-        pytester.syspathinsert(test_cwd)
+        shutil.copyfile(
+            settings.fixtures_path / manifest.requirements.template,
+            template_path
+        )
 
         dump_path = test_cwd / "full.txt"
 
@@ -122,8 +157,7 @@ def test_requirements_full(pytester, caplog, tmp_path, settings, install_structu
             "--manifest", manifest_filename,
             "--dump", dump_path,
         ])
-
-        debug_invoke(result, caplog)
+        # debug_invoke(result, caplog)
 
         # Get the written dump content
         output = dump_path.read_text().splitlines()
@@ -134,11 +168,11 @@ def test_requirements_full(pytester, caplog, tmp_path, settings, install_structu
             "# Base",
             "Django",
             "",
-            "# bar",
-            "bar-requirements",
-            "",
             "# foo",
             "foo-requirements",
+            "",
+            "# bar",
+            "bar-requirements",
             "",
             "# ping",
             "ping-requirements"
@@ -148,13 +182,14 @@ def test_requirements_full(pytester, caplog, tmp_path, settings, install_structu
             (
                 __pkgname__,
                 logging.WARNING,
-                "Unable to find module: apps_structure.nope"
+                "TextContentComposer is unable to find module: basic_structure.nope"
             ),
         ]
 
 
 @freeze_time("2012-10-15 10:00:00")
-def test_requirements_override(pytester, caplog, tmp_path, settings, install_structure):
+def test_requirements_override(monkeypatch, pytester, caplog, tmp_path, settings,
+                               basic_structure):
     """
     Manifest settings should be overrided from CLI arguments if given
     """
@@ -163,27 +198,45 @@ def test_requirements_override(pytester, caplog, tmp_path, settings, install_str
 
     runner = CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        # Enforce composer to use pytester.syspathinsert
+        monkeypatch.setattr(
+            TextContentComposer,
+            "set_syspaths",
+            mocked_composer_set_syspaths(pytester)
+        )
+
         test_cwd = Path(td)
 
+        # This test use a different path to the repository so we can test overriding
+        # manifest syspaths but it does not exists from structure so we create it on
+        # the fly
+        container = test_cwd / "override"
+        container.mkdir(mode=0o777)
+
         # Install sample structure into temp dir
-        install_structure(test_cwd)
+        structure = basic_structure(container)
+        # Rename repository dir to test overriding manifest repository from CLI args
+        new_repository = container / "new_repository"
+        structure.rename(new_repository)
         # Copy manifest sample into temp dir
         manifest_path = test_cwd / manifest_filename
-        manifest_path.write_text(manifest_source.read_text())
+        shutil.copyfile(manifest_source, manifest_path)
         # Load manifest to be able to read some of its values
         manifest = Manifest.load(manifest_path)
         # Copy template from manifest into temp dir
-        template_source = settings.fixtures_path / manifest.requirements.template
         template_path = test_cwd / "template.txt"
-        template_path.write_text(template_source.read_text())
-        # Append temporary repository path to sys.path during test execution
-        pytester.syspathinsert(test_cwd)
+        shutil.copyfile(
+            settings.fixtures_path / manifest.requirements.template,
+            template_path
+        )
 
         dump_path = test_cwd / "full.txt"
 
         result = runner.invoke(cli_frontend, [
             "requirements",
             "--manifest", manifest_filename,
+            "--syspath", str(container),
+            "--repository", "new_repository",
             "--dump", dump_path,
             "--applabel", "// App: {name}\n",
             "--appdivider", "//-\n",
@@ -192,7 +245,7 @@ def test_requirements_override(pytester, caplog, tmp_path, settings, install_str
             "--template", "template.txt",
         ])
 
-        debug_invoke(result, caplog)
+        # debug_invoke(result, caplog)
 
         # Get the written dump content
         output = dump_path.read_text().splitlines()
@@ -204,11 +257,11 @@ def test_requirements_override(pytester, caplog, tmp_path, settings, install_str
             "# Base",
             "Django",
             "//-",
-            "// App: bar",
-            "bar-source",
-            "//-",
             "// App: foo",
             "foo-source",
+            "//-",
+            "// App: bar",
+            "bar-source",
             "//-",
             "// App: ping",
             "ping-source"
@@ -218,6 +271,6 @@ def test_requirements_override(pytester, caplog, tmp_path, settings, install_str
             (
                 __pkgname__,
                 logging.WARNING,
-                "Unable to find module: apps_structure.nope"
+                "TextContentComposer is unable to find module: new_repository.nope"
             ),
         ]

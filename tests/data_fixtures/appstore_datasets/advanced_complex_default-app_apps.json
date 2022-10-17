@@ -1,0 +1,14 @@
+[
+    "django",
+    "forms",
+    "editor",
+    "filer",
+    "asset_manager",
+    "blog",
+    "contact",
+    "rest",
+    "shop",
+    "cms",
+    "cms_blog",
+    "cms_contact"
+]

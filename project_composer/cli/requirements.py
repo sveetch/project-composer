@@ -96,12 +96,20 @@ def requirements_command(*args, **parameters):
     logger.debug("Using manifest: {}".format(parameters["manifest"]))
     manifest = Manifest.load(parameters["manifest"])
 
+    # Patch arguments in multiple mode since they empty default list trouble the
+    # manifest settings overriding
+    if len(parameters.get("syspaths", [])) == 0:
+        parameters["syspaths"] = None
+
     # Override base manifest settings from given arguments
-    for name in manifest.get_fields():
-        if name != "requirements" and parameters.get(name) is not None:
+    # syspaths management have a special thing to avoid default value (empty list) to
+    # override the manifest value
+    for name in manifest.get_fieldnames():
+        if (name != "requirements" and parameters.get(name) is not None):
             setattr(manifest, name, parameters.get(name))
+
     # The same for requirements plugin
-    for name in manifest.requirements.get_fields():
+    for name in manifest.requirements.get_fieldnames():
         if parameters.get(name) is not None:
             setattr(manifest.requirements, name, parameters.get(name))
 

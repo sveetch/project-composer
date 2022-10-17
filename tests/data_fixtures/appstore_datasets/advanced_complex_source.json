@@ -1,0 +1,78 @@
+[
+    {
+        "name": "shop",
+        "dependencies": [
+            "editor",
+            "forms",
+            "rest"
+        ],
+        "push_end": true
+    },
+    {
+        "name": "cms",
+        "dependencies": [
+            "editor",
+            "filer"
+        ],
+        "push_end": true
+    },
+    {
+        "name": "forms"
+    },
+    {
+        "name": "django"
+    },
+    {
+        "name": "filer",
+        "dependencies": [
+            "forms"
+        ]
+    },
+    {
+        "name": "editor",
+        "dependencies": [
+            "forms"
+        ]
+    },
+    {
+        "name": "asset_manager",
+        "dependencies": [
+            "django"
+        ]
+    },
+    {
+        "name": "blog",
+        "dependencies": [
+            "filer",
+            "editor"
+        ]
+    },
+    {
+        "name": "rest",
+        "dependencies": [
+            "forms"
+        ],
+        "push_end": true
+    },
+    {
+        "name": "cms_blog",
+        "dependencies": [
+            "cms",
+            "blog"
+        ]
+    },
+    {
+        "name": "contact",
+        "dependencies": [
+            "forms"
+        ]
+    },
+    {
+        "name": "cms_contact",
+        "dependencies": [
+            "cms",
+            "contact"
+        ],
+        "push_end": true
+    }
+]

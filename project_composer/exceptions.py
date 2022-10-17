@@ -1,7 +1,4 @@
 """
-Exceptions
-==========
-
 Specific application exceptions.
 """
 
@@ -16,9 +13,30 @@ class ProjectComposerException(Exception):
     pass
 
 
+class ComposerError(ProjectComposerException):
+    """
+    Error occuring from a ComposerBase class or inheriter.
+    """
+    pass
+
+
+class ComposerConfigError(ProjectComposerException):
+    """
+    Error occuring from a BaseConfig class or inheriter.
+    """
+    pass
+
+
 class ComposerManifestError(ProjectComposerException):
     """
-    Error occuring when loading manifest.
+    Error occuring from a manifest.
+    """
+    pass
+
+
+class ComposerAppStoreError(ProjectComposerException):
+    """
+    Error occuring from Application store.
     """
     pass
 

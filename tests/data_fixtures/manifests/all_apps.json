@@ -1,11 +1,11 @@
 {
     "name": "All the application module",
-    "apps": [
+    "repository": "basic_structure",
+    "collection": [
         "bar",
         "dummy",
         "empty",
         "foo",
-        "invalid",
         "ping",
         "pong"
     ]

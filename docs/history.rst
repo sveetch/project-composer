@@ -4,6 +4,21 @@
 History
 =======
 
+Version 0.5.0 - Unreleased
+--------------------------
+
+**New features and refactoring which bring backward incompatible changes**
+
+* Implemented application order scheduling with ``DEPENDENCIES`` and ``PUSH_END``
+  variables within application base module (``__init__.py``);
+* ``Manifest.apps`` has been renamed to ``Manifest.collection``;
+* Added manifest field ``default_store_app`` to set a default application name to add
+  to applications without any dependency;
+* Added manifest field ``default_store_app`` to disable ordering resolution;
+* Fixed tests so every ones that performed structure sample importation are running
+  into a temporary directory, not anymore importing on structures from "data_fixtures";
+
+
 Version 0.4.2 - 2022/10/16
 --------------------------
 

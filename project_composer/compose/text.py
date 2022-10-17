@@ -1,9 +1,3 @@
-"""
-=====================
-Text content composer
-=====================
-
-"""
 import datetime
 
 from pathlib import Path
@@ -48,9 +42,9 @@ class TextContentComposer(ComposerBase):
 
         output += self.get_template(self.manifest.requirements.template)
 
-        for name in self.manifest.apps:
+        for node in self.apps:
             # Try to find application module
-            module_path = self.get_module_path(name)
+            module_path = self.get_module_path(node.name)
             module = self.find_app_module(module_path)
 
             if module and getattr(module, "__file__", None):
@@ -61,7 +55,11 @@ class TextContentComposer(ComposerBase):
                 )
                 # Try to find file from application to append its content to the output
                 if source_path.exists():
-                    self.log.debug("Found content file at: {}".format(source_path))
+                    msg = "{klass} found content file at: {path}".format(
+                        klass=self.__class__.__name__,
+                        path=source_path,
+                    )
+                    self.log.debug(msg)
 
                     content = source_path.read_text()
                     if content.strip():
@@ -70,18 +68,29 @@ class TextContentComposer(ComposerBase):
 
                         if self.manifest.requirements.application_label:
                             label = self.manifest.requirements.application_label
-                            output += label.format(name=name)
+                            output += label.format(name=node.name)
 
                         output += content
 
                 else:
-                    msg = "Unable to find content file from: {}"
-                    self.log.debug(msg.format(source_path))
+                    msg = "{klass} is unable to find content file from: {path}".format(
+                        klass=self.__class__.__name__,
+                        path=source_path,
+                    )
+                    self.log.debug(msg)
 
         return output
 
     def dump(self, destination):
+        """
+        Write export payload to a dump file.
 
+        Arguments:
+            destination (pathlib.Path): Path object for the dump file destination.
+
+        Returns:
+            pathlib.Path: The Path object where the file has been writed.
+        """
         output = self.export()
         destination.write_text(output)
 

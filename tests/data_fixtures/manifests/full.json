@@ -1,6 +1,6 @@
 {
     "name": "Full manifest JSON",
-    "apps": [
+    "collection": [
         "bar",
         "dummy",
         "empty",
@@ -9,11 +9,16 @@
         "pong",
         "nope"
     ],
-    "repository": "apps_structure",
+    "repository": "basic_structure",
+    "syspaths": [
+        "container"
+    ],
+    "default_store_app": "foo",
+    "no_ordering": false,
     "requirements": {
         "template": "requirements_template.txt",
         "application_label": "# {name}\n",
         "application_divider": "\n",
-        "introduction": false
+        "introduction": ""
     }
 }

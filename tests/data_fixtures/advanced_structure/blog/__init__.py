@@ -1,0 +1,4 @@
+DEPENDENCIES = [
+    "filer",
+    "editor"
+]

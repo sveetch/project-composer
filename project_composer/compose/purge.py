@@ -1,9 +1,3 @@
-"""
-==============
-Class composer
-==============
-
-"""
 import shutil
 from pathlib import Path
 
@@ -30,12 +24,15 @@ class PurgeApplications(ComposerBase):
         try:
             repository = import_module(self.manifest.repository)
         except ModuleNotFoundError:
-            msg = "Unable to find application repository module: {}"
-            raise ComposerPurgeError(msg.format(self.manifest.repository))
+            msg = "{klass} is unable to find application repository module from: {path}"
+            raise ComposerPurgeError(msg.format(
+                klass=self.__class__.__name__,
+                path=self.manifest.repository,
+            ))
 
         repository_path = Path(repository.__file__).parent
 
-        # List module directories from repository and filter out the ones have a name
+        # List module directories from repository and filter out the ones with a name
         # starting with "_"
         appdirs = [
             child
@@ -47,7 +44,7 @@ class PurgeApplications(ComposerBase):
         return [
             item
             for item in appdirs
-            if item.name not in self.manifest.apps
+            if item.name not in [a.name for a in self.apps]
         ]
 
     def commit(self):
@@ -57,7 +54,11 @@ class PurgeApplications(ComposerBase):
         to_remove = self.export()
 
         for path in to_remove:
-            self.log.info("Removing application module: {}".format(path))
+            msg = "{klass} is removing application: {path}".format(
+                klass=self.__class__.__name__,
+                path=path,
+            )
+            self.log.info(msg)
             shutil.rmtree(path)
 
         return to_remove

@@ -1,0 +1,17 @@
+[
+    {
+        "name": "foo"
+    },
+    {
+        "name": "bar",
+        "dependencies": [
+            "ping"
+        ]
+    },
+    {
+        "name": "ping",
+        "dependencies": [
+            "bar"
+        ]
+    }
+]

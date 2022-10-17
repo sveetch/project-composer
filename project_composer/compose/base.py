@@ -1,12 +1,8 @@
-"""
-=============
-Base composer
-=============
-
-"""
 import sys
 import inspect
 
+from ..app_storage import AppStore
+from ..exceptions import ComposerError
 from ..importer import import_module
 from ..logger import LoggerBase
 from ..manifest import Manifest
@@ -46,10 +42,35 @@ class ComposerBase(LoggerBase):
     def __init__(self, manifest, **kwargs):
         super().__init__()
 
-        self.manifest = Manifest.load(manifest)
+        self.manifest = self.get_manifest(manifest)
+        self.set_syspaths(self.manifest.syspaths or [])
+        self.apps = self.resolve_collection(manifest)
 
-        for item in (self.manifest.syspaths or []):
-            sys.path.append(item)
+    def get_manifest(self, manifest):
+        """
+        Return loaded manifest object.
+
+        Arguments:
+            manifest (string or pathlib.Path or dict or Manifest): The Manifest source
+                to load.
+
+        Returns:
+            Manifest: The manifest object loaded from given source.
+        """
+        return Manifest.load(manifest)
+
+    def set_syspaths(self, paths):
+        """
+        Append each item path to ``sys.path``.
+
+        This won't never append a same path twice.
+
+        Arguments:
+            paths (list): A list of path to append.
+        """
+        for path in paths:
+            if path not in sys.path:
+                sys.path.append(path)
 
     def get_module_path(self, name):
         """
@@ -83,7 +104,11 @@ class ComposerBase(LoggerBase):
         try:
             module = import_module(name)
         except ModuleNotFoundError:
-            self.log.warning("Unable to find module: {}".format(name))
+            msg = "{klass} is unable to find module: {path}".format(
+                klass=self.__class__.__name__,
+                path=name,
+            )
+            self.log.warning(msg)
             return None
         else:
             return module
@@ -95,8 +120,8 @@ class ComposerBase(LoggerBase):
         Criterias for eligibility are in order:
 
         * Object is a class;
-        * Object is not named ``EnabledApplicationMarker``;
-        * Object got attribute ``_ENABLED_COMPOSABLE_APPLICATION`` which value is not
+        * Class is not named ``EnabledApplicationMarker``;
+        * Class got attribute ``_ENABLED_COMPOSABLE_APPLICATION`` which value is not
           ``None``;
 
         Arguments:
@@ -119,7 +144,8 @@ class ComposerBase(LoggerBase):
         Get all elligible classes from a module.
 
         Arguments:
-            path (string): The Python path to a module, only used in logging messages.
+            path (string): The Python path to a module used for reporting and logging
+                messages.
             module (object): The module object where to find elligible classes.
 
         Returns:
@@ -128,17 +154,78 @@ class ComposerBase(LoggerBase):
         enabled = []
 
         if not hasattr(module, "__dict__"):
-            raise NotImplementedError("Module object must have a '__dict__' attribute.")
+            msg = "Module object from '{}' must have a '__dict__' attribute."
+            raise ComposerError(msg.format(path))
 
         for object_name in module.__dict__.keys():
             if not object_name.startswith("_"):
                 obj = getattr(module, object_name)
+
                 if self._is_elligible_class(obj):
-                    self.log.debug("Got enabled class at: {}.{}".format(
-                        path,
-                        object_name,
-                    ))
+                    msg = "{klass} found enabled Class at: {path}.{object_name}".format(
+                        klass=self.__class__.__name__,
+                        path=path,
+                        object_name=object_name,
+                    )
+                    self.log.debug(msg)
+
                     if obj not in enabled:
                         enabled.append(obj)
 
         return enabled
+
+    def _scan_app_module(self, name):
+        """
+
+        Arguments:
+            name (string):
+
+        Returns:
+            dict:
+        """
+        path = self.get_module_path(name)
+
+        # Try to find application module and get its possible parameter variables
+        module = self.find_app_module(path)
+        if module:
+            msg = "{klass} found application at: {path}".format(
+                klass=self.__class__.__name__,
+                path=path,
+            )
+            self.log.debug(msg)
+
+            payload = {"name": name}
+
+            if hasattr(module, "DEPENDENCIES"):
+                payload["dependencies"] = getattr(module, "DEPENDENCIES")
+
+            if hasattr(module, "PUSH_END"):
+                payload["push_end"] = getattr(module, "PUSH_END")
+
+            return payload
+
+        return None
+
+    def resolve_collection(self, manifest):
+        """
+        Resolve collection with AppStore.
+
+        Arguments:
+            manifest (Manifest): The Manifest object.
+
+        Returns:
+            list: List of AppNode.
+        """
+        collection = []
+
+        for name in self.manifest.collection:
+            payload = self._scan_app_module(name)
+            # Ignore unfound application
+            if payload:
+                collection.append(payload)
+
+        store = AppStore(
+            default_app=self.manifest.default_store_app,
+            no_ordering=self.manifest.no_ordering,
+        )
+        return store.resolve(collection)
