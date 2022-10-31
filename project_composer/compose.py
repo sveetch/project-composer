@@ -1,14 +1,14 @@
 import sys
 import inspect
 
-from ..app_storage import AppStore
-from ..exceptions import ComposerError
-from ..importer import import_module
-from ..logger import LoggerBase
-from ..manifest import Manifest
+from .app_storage import AppStore
+from .exceptions import ComposerError
+from .importer import import_module
+from .logger import LoggerBase
+from .manifest import Manifest
 
 
-class ComposerBase(LoggerBase):
+class Composer(LoggerBase):
     """
     Composer base implements everything about application module discovering and
     manifest loading.
@@ -25,26 +25,52 @@ class ComposerBase(LoggerBase):
 
             Source file format are guessed from their file extension such as JSON
             for ``.json`` or TOML for ``.toml``.
-
-    Keyword Arguments:
-        syspaths (list): A list of path to insert in sys.path, this is required if
-            ``repository`` module is not available directly in the current working
-            directory. You are responsible to no set twice paths, erroneous paths, etc..
-            There is no validation for the paths you give.
+        processors (list): List of available composition processors classes.
 
     Attributes:
-        _MODULE_PYTHONPATH (string): A template string to build the full Python path
-            of founded class. It expected two variable ``parent`` and ``name``,
-            respectively the module path and the class name.
+        _APPLICATION_MODULE_PYTHONPATH (string): A template string to build the full
+            Python path of founded class. It expected two variable ``parent`` and
+            ``name``, respectively the module path and the class name.
     """
-    _MODULE_PYTHONPATH = "{parent}.{name}"
+    _APPLICATION_MODULE_PYTHONPATH = "{parent}.{name}"
 
-    def __init__(self, manifest, **kwargs):
+    def __init__(self, manifest, processors=[]):
         super().__init__()
 
         self.manifest = self.get_manifest(manifest)
         self.set_syspaths(self.manifest.syspaths or [])
-        self.apps = self.resolve_collection(manifest)
+
+        self.store = AppStore(default_app=self.manifest.default_store_app)
+
+        self.apps = []
+
+        # Register and initialize all given processors
+        self.processors = {
+            proc.__name__: proc(self)
+            for proc in processors
+        }
+
+    def call_processor(self, name, method, **kwargs):
+        """
+        Return loaded manifest object.
+
+        Arguments:
+            name (string): Processor name in registry.
+            method (string): Processor method to execute.
+            **kwargs: Keyword arguments to pass to method if any.
+
+        Returns:
+            object: Content depend from Processor method returns.
+        """
+        if name not in self.processors:
+            msg = "Given processor name is not registered from composer: {}"
+            raise ComposerError(msg.format(name))
+
+        if not hasattr(self.processors[name], method):
+            msg = "Processor '{proc}' don't have any method named '{method}'"
+            raise ComposerError(msg.format(proc=name, method=method))
+
+        return getattr(self.processors[name], method)(**kwargs)
 
     def get_manifest(self, manifest):
         """
@@ -72,6 +98,27 @@ class ComposerBase(LoggerBase):
             if path not in sys.path:
                 sys.path.append(path)
 
+    def get_application_base_module_path(self, name):
+        """
+        Return the Python path to the application base module.
+
+        Commonly this should be the ``__init__.py`` file from application directory.
+
+        Arguments:
+            name (string): Module name.
+
+        Returns:
+            string: Module name prefixed with repository path if it is not empty else
+            returns just the module name.
+        """
+        if self.manifest.repository:
+            return self._APPLICATION_MODULE_PYTHONPATH.format(
+                parent=self.manifest.repository,
+                name=name,
+            )
+
+        return name
+
     def get_module_path(self, name):
         """
         Return a Python path for a module name.
@@ -83,13 +130,7 @@ class ComposerBase(LoggerBase):
             string: Module name prefixed with repository path if it is not empty else
             returns just the module name.
         """
-        if self.manifest.repository:
-            return self._MODULE_PYTHONPATH.format(
-                parent=self.manifest.repository,
-                name=name,
-            )
-
-        return name
+        return self.get_application_base_module_path(name)
 
     def find_app_module(self, name):
         """
@@ -206,12 +247,14 @@ class ComposerBase(LoggerBase):
 
         return None
 
-    def resolve_collection(self, manifest):
+    def resolve_collection(self, lazy=True):
         """
         Resolve collection with AppStore.
 
-        Arguments:
-            manifest (Manifest): The Manifest object.
+        Keyword Arguments:
+            lazy (boolean): If True, there won't be any dependency order resolving and
+                the application list will just be the collection with AppNode objects.
+                If False, the resolving will processed. Default is ``True``.
 
         Returns:
             list: List of AppNode.
@@ -224,8 +267,13 @@ class ComposerBase(LoggerBase):
             if payload:
                 collection.append(payload)
 
-        store = AppStore(
-            default_app=self.manifest.default_store_app,
-            no_ordering=self.manifest.no_ordering,
-        )
-        return store.resolve(collection)
+        if lazy:
+            self.apps = self.store.resolve(
+                collection,
+                no_ordering=True
+            )
+        else:
+            self.apps = self.store.resolve(
+                collection,
+                no_ordering=self.manifest.no_ordering
+            )

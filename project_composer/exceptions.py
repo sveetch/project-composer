@@ -15,7 +15,7 @@ class ProjectComposerException(Exception):
 
 class ComposerError(ProjectComposerException):
     """
-    Error occuring from a ComposerBase class or inheriter.
+    Error occuring from a Composer class or inheriter.
     """
     pass
 
@@ -41,7 +41,14 @@ class ComposerAppStoreError(ProjectComposerException):
     pass
 
 
-class ComposerPurgeError(ProjectComposerException):
+class ComposerProcessorError(ProjectComposerException):
+    """
+    Error occuring from a processor.
+    """
+    pass
+
+
+class ComposerPurgeError(ComposerProcessorError):
     """
     Error occuring when trying to purge an application repository.
     """

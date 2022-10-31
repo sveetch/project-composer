@@ -5,8 +5,9 @@ import click
 
 from .. import __pkgname__
 
-from ..compose import TextContentComposer
+from ..compose import Composer
 from ..manifest import Manifest
+from ..processors import TextContentProcessor
 
 from .base_options import COMMON_OPTIONS
 
@@ -125,14 +126,15 @@ def requirements_command(*args, **parameters):
         manifest.requirements.source_filename)
     )
 
-    composer = TextContentComposer(manifest)
+    composer = Composer(manifest, processors=[TextContentProcessor])
+    composer.resolve_collection(lazy=False)
 
     dump = parameters.get("dump")
     if dump:
         logger.debug("Dump destination: {}".format(dump))
         msg = "Requirements file written at: {}"
         logger.debug(msg.format(
-            composer.dump(dump)
+            composer.call_processor("TextContentProcessor", "dump", destination=dump)
         ))
     else:
-        click.echo(composer.export())
+        click.echo(composer.call_processor("TextContentProcessor", "export"))

@@ -1,8 +1,10 @@
 import pytest
 
-from project_composer.compose import ComposerBase
+from project_composer.compose import Composer
+from project_composer.exceptions import ComposerError
 from project_composer.importer import import_module
 from project_composer.manifest import Manifest
+from project_composer.processors import ComposerProcessor
 
 
 def test_manifest_valid_file(settings):
@@ -11,7 +13,7 @@ def test_manifest_valid_file(settings):
     """
     manifest_path = settings.fixtures_path / "manifests" / "basic.json"
 
-    composer = ComposerBase(manifest_path)
+    composer = Composer(manifest_path)
 
     assert composer.manifest.name == "Sample"
     assert composer.manifest.collection == [
@@ -34,7 +36,7 @@ def test_manifest_valid_model():
         ],
         repository="foo",
     )
-    composer = ComposerBase(manifest)
+    composer = Composer(manifest)
     assert composer.manifest.name == "Sample"
     assert composer.manifest.collection == [
         "foo",
@@ -61,7 +63,7 @@ def test_get_module_path(repository, name, expected):
     Method should return the right expected path depending composer attribute
     'repository' value.
     """
-    composer = ComposerBase({
+    composer = Composer({
         "name": "Sample",
         "collection": [],
         "repository": repository,
@@ -73,7 +75,7 @@ def test_find_app_module_notfound():
     """
     Importation should fail without exception but still emit a warning log
     """
-    composer = ComposerBase({
+    composer = Composer({
         "name": "Sample",
         "collection": [],
         "repository": None,
@@ -91,7 +93,7 @@ def test_find_app_module_success(pytester, basic_structure):
 
     pytester.syspathinsert(pytester.path)
 
-    composer = ComposerBase({
+    composer = Composer({
         "name": "Sample",
         "collection": [],
         "repository": "basic_structure",
@@ -111,7 +113,7 @@ def test_find_app_module_success2(pytester, basic_structure):
 
     pytester.syspathinsert(pytester.path)
 
-    composer = ComposerBase({
+    composer = Composer({
         "name": "Sample",
         "collection": [],
         "repository": "basic_structure",
@@ -131,7 +133,7 @@ def test_find_app_module_invalid(pytester, basic_structure):
 
     pytester.syspathinsert(pytester.path)
 
-    composer = ComposerBase({
+    composer = Composer({
         "name": "Sample",
         "collection": [],
         "repository": "basic_structure",
@@ -143,6 +145,52 @@ def test_find_app_module_invalid(pytester, basic_structure):
         assert composer.find_app_module(module_path)
 
 
+def test_call_processor_errors(pytester, basic_structure):
+    """
+    Method 'call_processor' should behaves as expected depending how it is used, with
+    some internal validation.
+    """
+    class DummyProcessor(ComposerProcessor):
+        def foo(self):
+            return "Foo"
+
+        def hello(self, **kwargs):
+            return "Hello {}".format(kwargs.get("word"))
+
+    basic_structure(pytester.path)
+
+    pytester.syspathinsert(pytester.path)
+
+    composer = Composer(
+        {
+            "name": "Sample",
+            "collection": [],
+            "repository": "basic_structure",
+        },
+        processors=[DummyProcessor],
+    )
+
+    assert composer.call_processor("DummyProcessor", "foo") == "Foo"
+
+    assert composer.call_processor("DummyProcessor", "hello", word="World") == (
+        "Hello World"
+    )
+
+    with pytest.raises(ComposerError) as exc_info:
+        composer.call_processor("NopeProcessor", "foo")
+
+    assert exc_info.value.args[0] == (
+        "Given processor name is not registered from composer: NopeProcessor"
+    )
+
+    with pytest.raises(ComposerError) as exc_info:
+        composer.call_processor("DummyProcessor", "nope")
+
+    assert exc_info.value.args[0] == (
+        "Processor 'DummyProcessor' don't have any method named 'nope'"
+    )
+
+
 def test_get_elligible_module_classes(pytester, basic_structure):
     """
     All EnabledApplicationMarker inheriters from a module should be found as elligible.
@@ -151,7 +199,7 @@ def test_get_elligible_module_classes(pytester, basic_structure):
 
     pytester.syspathinsert(pytester.path)
 
-    composer = ComposerBase({"name": "Sample", "collection": [], "repository": None})
+    composer = Composer({"name": "Sample", "collection": [], "repository": None})
 
     dummy = import_module("basic_structure.dummy")
     foo_settings = import_module("basic_structure.foo.settings")
@@ -170,9 +218,102 @@ def test_get_elligible_module_classes(pytester, basic_structure):
     assert classes == [bar_settings.BarFirstSettings, bar_settings.BarSecondSettings]
 
 
-def test_composer_resolve_apps(pytester, advanced_structure):
+@pytest.mark.parametrize("default_app, no_ordering, lazy, expected", [
+    (
+        None,
+        False,
+        False,
+        [
+            "forms",
+            "editor",
+            "filer",
+            "django",
+            "blog",
+            "rest",
+            "cms",
+            "cms_blog",
+        ],
+    ),
+    (
+        "django",
+        False,
+        False,
+        [
+            "django",
+            "forms",
+            "editor",
+            "filer",
+            "blog",
+            "rest",
+            "cms",
+            "cms_blog",
+        ],
+    ),
+    (
+        None,
+        True,
+        False,
+        [
+            "cms",
+            "django",
+            "forms",
+            "filer",
+            "editor",
+            "blog",
+            "rest",
+            "cms_blog"
+        ],
+    ),
+    (
+        None,
+        False,
+        True,
+        [
+            "cms",
+            "django",
+            "forms",
+            "filer",
+            "editor",
+            "blog",
+            "rest",
+            "cms_blog"
+        ],
+    ),
+    (
+        None,
+        True,
+        True,
+        [
+            "cms",
+            "django",
+            "forms",
+            "filer",
+            "editor",
+            "blog",
+            "rest",
+            "cms_blog"
+        ],
+    ),
+    (
+        "django",
+        True,
+        True,
+        [
+            "cms",
+            "django",
+            "forms",
+            "filer",
+            "editor",
+            "blog",
+            "rest",
+            "cms_blog"
+        ],
+    ),
+])
+def test_composer_resolve_apps(pytester, advanced_structure, default_app, no_ordering,
+                               lazy, expected):
     """
-    Composer should get the right resolved collection.
+    Composer should set the right app list depending parameters.
     """
     advanced_structure(pytester.path)
 
@@ -192,102 +333,13 @@ def test_composer_resolve_apps(pytester, advanced_structure):
             "rest",
             "cms_blog",
         ],
+        default_store_app=default_app,
+        no_ordering=no_ordering,
         repository="advanced_structure",
     )
 
     # Start composer which will immediately proceed to resolve
-    composer = ComposerBase(manifest)
+    composer = Composer(manifest)
+    composer.resolve_collection(lazy=lazy)
 
-    assert [item.name for item in composer.apps] == [
-        "forms",
-        "editor",
-        "filer",
-        "django",
-        "blog",
-        "rest",
-        "cms",
-        "cms_blog",
-    ]
-
-
-def test_composer_resolve_apps_default_app(pytester, advanced_structure):
-    """
-    Composer should get the right resolved collection with "default_store_app" usage.
-    """
-    advanced_structure(pytester.path)
-
-    pytester.syspathinsert(pytester.path)
-
-    # Craft manifest
-    manifest = Manifest(
-        name="Advanced",
-        collection=[
-            "nope",
-            "cms",
-            "django",
-            "forms",
-            "filer",
-            "editor",
-            "blog",
-            "rest",
-            "cms_blog",
-        ],
-        default_store_app="django",
-        repository="advanced_structure",
-    )
-
-    # Start composer which will immediately proceed to resolve
-    composer = ComposerBase(manifest)
-
-    assert [item.name for item in composer.apps] == [
-        "django",
-        "forms",
-        "editor",
-        "filer",
-        "blog",
-        "rest",
-        "cms",
-        "cms_blog",
-    ]
-
-
-def test_composer_resolve_apps_no_ordering(pytester, advanced_structure):
-    """
-    Composer should return app list with collection natural order when "no_ordering"
-    enabled.
-    """
-    advanced_structure(pytester.path)
-
-    pytester.syspathinsert(pytester.path)
-
-    # Craft manifest
-    manifest = Manifest(
-        name="Advanced",
-        collection=[
-            "nope",
-            "cms",
-            "django",
-            "forms",
-            "filer",
-            "editor",
-            "blog",
-            "rest",
-            "cms_blog",
-        ],
-        no_ordering=True,
-        repository="advanced_structure",
-    )
-
-    # Start composer which will immediately proceed to resolve
-    composer = ComposerBase(manifest)
-
-    assert [item.name for item in composer.apps] == [
-        "cms",
-        "django",
-        "forms",
-        "filer",
-        "editor",
-        "blog",
-        "rest",
-        "cms_blog"
-    ]
+    assert [item.name for item in composer.apps] == expected

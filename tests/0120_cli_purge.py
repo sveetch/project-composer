@@ -64,29 +64,29 @@ def test_purge_commit(pytester, caplog, tmp_path, settings, basic_structure):
             (
                 __pkgname__,
                 logging.WARNING,
-                "PurgeApplications is unable to find module: basic_structure.nope"
+                "Composer is unable to find module: basic_structure.nope"
             ),
             (
                 __pkgname__,
                 logging.INFO,
-                "PurgeApplications is removing application: {}/pong".format(structure),
+                "PurgeProcessor is removing application: {}/pong".format(structure),
             ),
             (
                 __pkgname__,
                 logging.INFO,
-                "PurgeApplications is removing application: {}/invalid".format(
+                "PurgeProcessor is removing application: {}/invalid".format(
                     structure
                 ),
             ),
             (
                 __pkgname__,
                 logging.INFO,
-                "PurgeApplications is removing application: {}/dummy".format(structure),
+                "PurgeProcessor is removing application: {}/dummy".format(structure),
             ),
             (
                 __pkgname__,
                 logging.INFO,
-                "PurgeApplications is removing application: {}/empty".format(structure),
+                "PurgeProcessor is removing application: {}/empty".format(structure),
             ),
         ]
 
@@ -173,7 +173,7 @@ def test_purge_export(pytester, caplog, tmp_path, settings, basic_structure):
             "--repository", "basic_structure",
         ])
 
-        # debug_invoke(result, caplog)
+        debug_invoke(result, caplog)
 
         assert result.exit_code == 0
 
@@ -192,7 +192,7 @@ def test_purge_export(pytester, caplog, tmp_path, settings, basic_structure):
             (
                 __pkgname__,
                 logging.WARNING,
-                "PurgeApplications is unable to find module: basic_structure.nope"
+                "Composer is unable to find module: basic_structure.nope"
             ),
             (
                 __pkgname__,
@@ -240,7 +240,7 @@ def test_purge_export_empty(pytester, caplog, tmp_path, settings, basic_structur
             "--repository", "basic_structure",
         ])
 
-        # debug_invoke(result, caplog)
+        debug_invoke(result, caplog)
 
         assert result.exit_code == 0
 

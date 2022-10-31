@@ -57,3 +57,56 @@ the whole collection.
 Once collected you can use the applications parts to build some project parts. Like
 you can collect every application settings classes to build an unique settings file
 correctly ordered.
+
+Composition classes tree
+************************
+
+Here for (temporary) technical sample is the involved classes tree when using something
+like the ``ComposeDjangoSettings``: ::
+
+    ComposeDjangoSettings
+    └── ClassComposer
+        └── Composer
+            ├── AppStore
+            │   └── AppNode
+            └── Manifest
+                ├── BaseConfig
+                │   └── Field classes
+                └── RequirementsConfig
+
+
+* **RequirementsConfig** is a plugin field, that is only used by requirement composer,
+  it is always involved but not used except with requirement composer;
+* **Fields** are defined in BaseConfig;
+* **BaseConfig** is a base for Manifest but only to implement the field management and
+  serialization;
+* **Manifest** is the highest configuration layer, it implements the way to load manifest
+  parameters as config fields. This is the object given to composer to transport
+  configuration;
+* **AppStore** process application collection defined in manifest to turn each
+  application to an **AppNode** then possibly perform dependency resolving and
+  ordering. It is only used inside the composer;
+* **Composer** implement base methods to process manifest collection and module
+  import;
+* **ClassComposer** is a common base class to collect Python classes from an
+  application module;
+* **ComposeDjangoSettings** is currently the highest layer possible, it just implement
+  specific composer code on top of ClassComposer;
+
+Here is the wanted new tree: ::
+
+    Composer
+    └── ClassComposer inheriters
+    ├── AppStore
+    │   └── AppNode
+    └── Manifest
+        ├── BaseConfig
+        │   └── Field classes
+        └── RequirementsConfig
+
+* **ClassComposer** inheriters (probably to rename) would be some processor classes
+  (zero to infinite) that would be looped to work on their specific behaviors using the
+  manifest;
+* This would benefit to the composer which could run multiple processing task kinds in
+  a single instance. Currently we need to start multiple composer instance, each one
+  for a processing tasks, it's inefficient;

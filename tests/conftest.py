@@ -1,6 +1,7 @@
 """
 Pytest fixtures
 """
+import json
 import shutil
 
 from pathlib import Path
@@ -8,6 +9,7 @@ from pathlib import Path
 import pytest
 
 import project_composer
+from project_composer.utils.encoding import ExtendedJsonEncoder
 
 
 pytest_plugins = "pytester"
@@ -141,8 +143,8 @@ def advanced_structure(settings):
     Example:
         With usage like this: ::
 
-            def test_foo( directory):
-                foo =  directory(
+            def test_foo(advanced_structure):
+                foo = advanced_structure(
                     Path("/home/foo/bar"),
                     source=Path("/tmp"),
                 )
@@ -154,5 +156,34 @@ def advanced_structure(settings):
         source = settings.fixtures_path / "advanced_structure"
 
         return install_structure(basepath, source)
+
+    return curry
+
+
+@pytest.fixture(scope="function")
+def json_debug():
+    """
+    Shortcut for a clean printer of data serialized as JSON with indentation.
+
+    The serializer will use a custom encoder to support some object type.
+
+    Example:
+        With usage like this: ::
+
+            def test_foo(json_debug):
+                json_debug({
+                    "foo": "Foo",
+                    "bar": 42,
+                    "ping": ["pong"]
+                })
+
+        Output is directly printed out.
+    """
+    def curry(content):
+        print()
+        print(
+            json.dumps(content, indent=4, cls=ExtendedJsonEncoder)
+        )
+        print()
 
     return curry

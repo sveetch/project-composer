@@ -4,7 +4,23 @@
 History
 =======
 
-Version 0.5.0 - Unreleased
+Version 0.6.0 - 2022/11/02
+--------------------------
+
+**Refactoring which bring backward incompatible changes**
+
+* Refactored composer layer to use sub processors for part kinds (classes, django,
+  text, etc..) so an unique composer instance can process multiple parts and this is
+  more efficient that using a new composer for each part;
+* Fixed resolving issues with application order resolving, Composer inheriter and
+  ``_MODULE_PYTHONPATH`` (that have be renamed to ``_APPLICATION_MODULE_PYTHONPATH``);
+* Composer do not execute its ``resolve_collection`` method on init, it needs to be
+  called explicitely after, resulting in its attribute ``apps`` to be empty on init;
+* Added ``lazy`` option to ``Composer.resolve_collection()`` method to enforce
+  lazy ordering even if the manifest attribute ``no_ordering`` is disabled;
+
+
+Version 0.5.0 - 2022/10/31
 --------------------------
 
 **New features and refactoring which bring backward incompatible changes**

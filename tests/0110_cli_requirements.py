@@ -19,7 +19,7 @@ from project_composer import __pkgname__
 from project_composer.cli.entrypoint import cli_frontend
 # from project_composer.utils.tests import debug_invoke
 from project_composer.manifest import Manifest
-from project_composer.compose import TextContentComposer
+from project_composer.compose import Composer
 
 
 def test_requirements_manifest_opt_fail(caplog):
@@ -89,7 +89,7 @@ def test_requirements_basic(pytester, caplog, tmp_path, settings, basic_structur
             (
                 __pkgname__,
                 logging.WARNING,
-                "TextContentComposer is unable to find module: basic_structure.nope"
+                "Composer is unable to find module: basic_structure.nope"
             ),
         ]
 
@@ -124,7 +124,7 @@ def test_requirements_full(monkeypatch, pytester, caplog, tmp_path, settings,
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         # Enforce composer to use pytester.syspathinsert
         monkeypatch.setattr(
-            TextContentComposer,
+            Composer,
             "set_syspaths",
             mocked_composer_set_syspaths(pytester)
         )
@@ -182,7 +182,7 @@ def test_requirements_full(monkeypatch, pytester, caplog, tmp_path, settings,
             (
                 __pkgname__,
                 logging.WARNING,
-                "TextContentComposer is unable to find module: basic_structure.nope"
+                "Composer is unable to find module: basic_structure.nope"
             ),
         ]
 
@@ -200,7 +200,7 @@ def test_requirements_override(monkeypatch, pytester, caplog, tmp_path, settings
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         # Enforce composer to use pytester.syspathinsert
         monkeypatch.setattr(
-            TextContentComposer,
+            Composer,
             "set_syspaths",
             mocked_composer_set_syspaths(pytester)
         )
@@ -271,6 +271,6 @@ def test_requirements_override(monkeypatch, pytester, caplog, tmp_path, settings
             (
                 __pkgname__,
                 logging.WARNING,
-                "TextContentComposer is unable to find module: new_repository.nope"
+                "Composer is unable to find module: new_repository.nope"
             ),
         ]

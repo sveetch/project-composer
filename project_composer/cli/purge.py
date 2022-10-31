@@ -4,8 +4,9 @@ import click
 
 from .. import __pkgname__
 
-from ..compose import PurgeApplications
+from ..compose import Composer
 from ..manifest import Manifest
+from ..processors import PurgeProcessor
 
 from .base_options import COMMON_OPTIONS
 
@@ -72,13 +73,14 @@ def purge_command(*args, **parameters):
     for item in manifest.syspaths:
         logger.debug("Loading in sys.path: {}".format(item))
 
-    composer = PurgeApplications(manifest)
+    composer = Composer(manifest, processors=[PurgeProcessor])
+    composer.resolve_collection(lazy=False)
 
     commit = parameters.get("commit")
     if commit:
-        to_remove = composer.commit()
+        to_remove = composer.call_processor("PurgeProcessor", "commit")
     else:
-        to_remove = composer.export()
+        to_remove = composer.call_processor("PurgeProcessor", "export")
         for path in to_remove:
             msg = "This application module would be removed: {}"
             logger.info(msg.format(path))

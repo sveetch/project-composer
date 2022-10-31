@@ -21,6 +21,7 @@ def test_get_fields():
         _FIELDS = [name_field, apps_field, contents_field]
 
         def __init__(self, *args, **kwargs):
+            # Disable initial initialize
             pass
 
     # Directly as class methods
@@ -52,6 +53,7 @@ def test_validate_attributes():
         _FIELDS = [name_field, apps_field, contents_field]
 
         def __init__(self, *args, **kwargs):
+            # Disable initial initialize
             pass
 
     # Config without the required field
@@ -87,6 +89,7 @@ def test_install_attributes():
         _FIELDS = [name_field, apps_field, contents_field]
 
         def __init__(self, *args, **kwargs):
+            # Disable initial initialize
             pass
 
     # Basic config only with required field
@@ -105,3 +108,36 @@ def test_install_attributes():
     assert manifest.name == "foo"
     assert manifest.collection == ["plop", "plip"]
     assert manifest.contents.category == "zen"
+
+
+def test_install_to_dict(json_debug):
+    """
+    Class fields should be correctly installed as object attributes depending their
+    parameters and given kwargs.
+    """
+    class SubConfig(BasePluginConfig):
+        _FIELDS = [CharField("category", default="Filou")]
+
+    class BasicConfig(BaseConfig):
+        _FIELDS = [
+            CharField("name", required=True),
+            ListField("collection"),
+            PluginField("contents", plugin=SubConfig),
+        ]
+
+    manifest = BasicConfig(
+        name="foo",
+        collection=["plop", "plip"],
+        contents={"pi": "po", "category": "zen"}
+    )
+
+    assert manifest.to_dict() == {
+        "name": "foo",
+        "collection": [
+            "plop",
+            "plip"
+        ],
+        "contents": {
+            "category": "zen"
+        }
+    }

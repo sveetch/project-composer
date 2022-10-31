@@ -48,9 +48,6 @@ class AppStore:
         default_app (string): Application name to attach as dependencies for
             applications that don't have any dependency. The name must exists in given
             collection. By default no default dependency is applied.
-        no_ordering (boolean): If ``True`` the ``AppStore.resolve()`` directly return
-            the AppNode list with original order from collection. There won't be any
-            resolution. Default is ``False``.
 
     Attributes:
         default_app (string): The value of ``default_app`` argument.
@@ -58,9 +55,8 @@ class AppStore:
             AppNode) filled by ``AppStore.process_collection()``.
 
     """
-    def __init__(self, default_app=None, no_ordering=False):
+    def __init__(self, default_app=None):
         self.default_app = default_app
-        self.no_ordering = no_ordering
         self.processed_apps = []
 
     def get_app(self, name, default=None):
@@ -192,7 +188,7 @@ class AppStore:
         resolved.append(node)
         unresolved.remove(node)
 
-    def resolve(self, collection, flat=False):
+    def resolve(self, collection, flat=False, no_ordering=False):
         """
         Resolve app list in order of app dependencies such as an app is always after
         all its dependencies.
@@ -203,6 +199,9 @@ class AppStore:
         Keyword Arguments:
             flat (boolean): If True, returned list will be AppNode payload. Default to
                 False.
+            no_ordering (boolean): If ``True`` the ``AppStore.resolve()`` directly
+                return the AppNode list with original order from collection. There
+                won't be any resolution. Default is ``False``.
 
         Returns:
             list: List of AppNode object or payload (dict) respectively depending flat
@@ -216,7 +215,7 @@ class AppStore:
 
         # By pass further resolving to return the app list ordered with its natural
         # order
-        if self.no_ordering:
+        if no_ordering:
             ordered_resolve = self.processed_apps
         # Proceed to the last resolving actions
         else:

@@ -9,8 +9,6 @@ from project_composer.manifest import RequirementsConfig, Manifest
 def test_manifest_to_dict():
     """
     Manifest object should correctly dump all its field values to a dictionnary.
-
-    TODO: to_dict depends from BaseConfig move it to its test file.
     """
     manifest = Manifest(
         name="foo",

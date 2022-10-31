@@ -1,12 +1,12 @@
-from .base import ComposerBase
+from .base import ComposerProcessor
 
 
-class ClassComposer(ComposerBase):
+class ClassProcessor(ComposerProcessor):
     """
     Class composer find all existing classes for enabled application modules and that
     match criterias from ``_is_elligible_class``.
     """
-    def export(self):
+    def export(self, **kwargs):
         """
         Export enabled applications classes.
 
@@ -20,21 +20,22 @@ class ClassComposer(ComposerBase):
         mods = []
         _mod_names = set([])
 
-        for node in self.apps:
+        for node in self.composer.apps:
             path = self.get_module_path(node.name)
 
             # Try to find module
-            module = self.find_app_module(path)
+            module = self.composer.find_app_module(path)
             if module:
                 msg = "{klass} found module at: {path}".format(
                     klass=self.__class__.__name__,
                     path=path,
                 )
-                self.log.debug(msg)
+                self.composer.log.debug(msg)
 
                 mods.extend([
                     item
-                    for item in self._get_elligible_module_classes(path, module)
+                    for item in self.composer._get_elligible_module_classes(path,
+                                                                            module)
                     if item.__name__ not in _mod_names
                 ])
                 # Update the list of unique retained class names which are used

@@ -2,8 +2,8 @@ import logging
 
 import pytest
 
-from project_composer import __pkgname__
-from project_composer.compose import PurgeApplications
+from project_composer.compose import Composer
+from project_composer.processors import PurgeProcessor
 from project_composer.exceptions import ComposerPurgeError
 
 
@@ -18,53 +18,47 @@ def test_purge_export_success(pytester, caplog, settings, basic_structure):
 
     pytester.syspathinsert(pytester.path)
 
-    purger = PurgeApplications(
+    composer = Composer(
         {
             "name": "Sample",
             "collection": ["ping", "foo"],
             "repository": "basic_structure",
         },
+        processors=[PurgeProcessor],
     )
+    composer.resolve_collection(lazy=False)
 
     # Get the class names to avoid importing module classes for assertions
     dirnames = [
         item.name
-        for item in purger.export()
+        for item in composer.call_processor("PurgeProcessor", "export")
     ]
 
     assert sorted(dirnames) == ["bar", "dummy", "empty", "invalid", "pong"]
 
-    assert caplog.record_tuples == [
-        (
-            __pkgname__,
-            logging.DEBUG,
-            "PurgeApplications found application at: basic_structure.ping"
-        ),
-        (
-            __pkgname__,
-            logging.DEBUG,
-            "PurgeApplications found application at: basic_structure.foo"
-        )
+    assert [log[2] for log in caplog.record_tuples] == [
+        "Composer found application at: basic_structure.ping",
+        "Composer found application at: basic_structure.foo",
     ]
 
 
-def test_purge_export_fail(pytester, caplog):
+def test_purge_export_fail(pytester):
     """
     When the given repository module is not found from import_lib, it  will raises
     an exception 'ComposerPurgeError'
     """
-    caplog.set_level(logging.DEBUG)
-
-    purger = PurgeApplications(
+    composer = Composer(
         {
             "name": "Sample",
             "collection": ["ping", "foo"],
             "repository": "not_importable_dummy_repository_module_path",
         },
+        processors=[PurgeProcessor],
     )
+    composer.resolve_collection(lazy=False)
 
     with pytest.raises(ComposerPurgeError):
-        purger.export()
+        composer.call_processor("PurgeProcessor", "export")
 
 
 def test_purge_commit(pytester, caplog, settings, basic_structure):
@@ -78,15 +72,17 @@ def test_purge_commit(pytester, caplog, settings, basic_structure):
 
     pytester.syspathinsert(pytester.path)
 
-    purger = PurgeApplications(
+    composer = Composer(
         {
             "name": "Sample",
             "collection": ["ping", "foo"],
             "repository": "basic_structure",
         },
+        processors=[PurgeProcessor],
     )
+    composer.resolve_collection(lazy=False)
 
-    purger.commit()
+    composer.call_processor("PurgeProcessor", "commit")
 
     remaining_module_dirs = sorted([
         item.name
@@ -96,40 +92,12 @@ def test_purge_commit(pytester, caplog, settings, basic_structure):
 
     assert remaining_module_dirs == ["foo", "ping"]
 
-    assert caplog.record_tuples == [
-        (
-            __pkgname__,
-            logging.DEBUG,
-            "PurgeApplications found application at: basic_structure.ping"
-        ),
-        (
-            __pkgname__,
-            logging.DEBUG,
-            "PurgeApplications found application at: basic_structure.foo"
-        ),
-        (
-            __pkgname__,
-            logging.INFO,
-            "PurgeApplications is removing application: {}/bar".format(structure)
-        ),
-        (
-            __pkgname__,
-            logging.INFO,
-            "PurgeApplications is removing application: {}/pong".format(structure)
-        ),
-        (
-            __pkgname__,
-            logging.INFO,
-            "PurgeApplications is removing application: {}/invalid".format(structure)
-        ),
-        (
-            __pkgname__,
-            logging.INFO,
-            "PurgeApplications is removing application: {}/dummy".format(structure)
-        ),
-        (
-            __pkgname__,
-            logging.INFO,
-            "PurgeApplications is removing application: {}/empty".format(structure)
-        )
+    assert [log[2] for log in caplog.record_tuples] == [
+        "Composer found application at: basic_structure.ping",
+        "Composer found application at: basic_structure.foo",
+        "PurgeProcessor is removing application: {}/bar".format(structure),
+        "PurgeProcessor is removing application: {}/pong".format(structure),
+        "PurgeProcessor is removing application: {}/invalid".format(structure),
+        "PurgeProcessor is removing application: {}/dummy".format(structure),
+        "PurgeProcessor is removing application: {}/empty".format(structure),
     ]

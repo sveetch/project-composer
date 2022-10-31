@@ -85,8 +85,6 @@ def test_appnode_to_payload():
 def test_appstore_collection_circular_reference(settings):
     """
     Should a raise an exception for circular reference.
-
-    TODO: Parametrize with "no_ordering" parameter
     """
     resolver = AppStore()
     source_path = (
@@ -97,6 +95,42 @@ def test_appstore_collection_circular_reference(settings):
         resolver.resolve(json.loads(source_path.read_text()))
 
     assert exc_info.value.args[0] == "Circular reference detected: ping -> bar"
+
+
+def test_appstore_collection_circular_reference_disabled(settings):
+    """
+    With "no_ordering" option enabled, the resolving does not perform circular
+    reference validation and so should not raise exception about it.
+
+    """
+    resolver = AppStore()
+    source_path = (
+        settings.fixtures_path / "appstore_datasets" / "circular_error_source.json"
+    )
+
+    resolved = resolver.resolve(json.loads(source_path.read_text()), no_ordering=True)
+
+    assert [item.to_payload() for item in resolved] == [
+        {
+            "name": "foo",
+            "dependencies": [],
+            "push_end": False
+        },
+        {
+            "name": "bar",
+            "dependencies": [
+                "ping"
+            ],
+            "push_end": False
+        },
+        {
+            "name": "ping",
+            "dependencies": [
+                "bar"
+            ],
+            "push_end": False
+        }
+    ]
 
 
 def test_appstore_duplicate_names(settings):
@@ -161,13 +195,6 @@ def test_appstore_default_app():
     pong = AppNode("pong")
     pong.add_dependency(foo)
     pong.add_dependency(ping)
-
-    # print(json.dumps([
-    #     foo.to_payload(),
-    #     bar.to_payload(),
-    #     ping.to_payload(),
-    #     pong.to_payload(),
-    # ], indent=4))
 
     store = AppStore(default_app="foo")
     store.process_collection([
@@ -240,16 +267,7 @@ def test_appstore_resolve_push_end():
     ])
 
     # Get the resolved item as payload without any AppNode, just string names
-    resolved_payload = [
-        item.to_payload()
-        for item in resolved
-    ]
-
-    # print()
-    # print(json.dumps(resolved_payload, indent=4))
-    # print()
-
-    assert resolved_payload == [
+    assert [item.to_payload() for item in resolved] == [
         {
             "name": "bar",
             "dependencies": [],
@@ -319,7 +337,7 @@ def test_appstore_resolve_no_ordering(no_ordering, expected):
     When 'no_ordering' is enabled the resolve method should return the app list in the
     natural order from collection else this is the final resolved order.
     """
-    store = AppStore(no_ordering=no_ordering)
+    store = AppStore()
     resolved = store.resolve([
         {
             "name": "zap",
@@ -350,11 +368,7 @@ def test_appstore_resolve_no_ordering(no_ordering, expected):
         {
             "name": "twip",
         },
-    ], flat=True)
-
-    # print()
-    # print(json.dumps(resolved, indent=4))
-    # print()
+    ], flat=True, no_ordering=no_ordering)
 
     assert resolved == expected
 
@@ -424,8 +438,6 @@ def test_appstore_resolve_no_ordering(no_ordering, expected):
 def test_appstore_dump_resolve_datasets(settings, source, expected, default_app):
     """
     Dump the source and resolved result in JSON in data_fixtures
-
-    TODO: Parametrize with "no_ordering" parameter
     """
 
     source_path = settings.fixtures_path / "appstore_datasets" / source
@@ -439,7 +451,7 @@ def test_appstore_dump_resolve_datasets(settings, source, expected, default_app)
         for item in resolver.resolve(json.loads(source_path.read_text()))
     ]
 
-    # from project_composer.utils.encoding import dump_datasets
+    # from project_composer.utils.tests import dump_datasets
     # dump_datasets(
     #    settings.fixtures_path / "appstore_datasets",
     #    source,
