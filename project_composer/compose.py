@@ -18,7 +18,7 @@ class Composer(LoggerBase):
             load. It can be either:
 
             * A Manifest object, it will just returned as it without any validation,
-                you are responsible of its correctness;
+              you are responsible of its correctness;
             * A string for the file path to load in JSON or TOML format;
             * A Path object to the file to load in JSON or TOML format;
             * A Dictionnary which respect the manifest structure;
@@ -29,7 +29,7 @@ class Composer(LoggerBase):
 
     Attributes:
         _APPLICATION_MODULE_PYTHONPATH (string): A template string to build the full
-            Python path of founded class. It expected two variable ``parent`` and
+            Python path of founded class. It expected two variables ``parent`` and
             ``name``, respectively the module path and the class name.
     """
     _APPLICATION_MODULE_PYTHONPATH = "{parent}.{name}"
@@ -253,11 +253,12 @@ class Composer(LoggerBase):
 
         Keyword Arguments:
             lazy (boolean): If True, there won't be any dependency order resolving and
-                the application list will just be the collection with AppNode objects.
-                If False, the resolving will processed. Default is ``True``.
+                the application list will just be the collection with ``AppNode``
+                objects instead of name strings. If False, the resolving will be
+                processed. Default is ``True``.
 
         Returns:
-            list: List of AppNode.
+            list: List of ``AppNode`` objects.
         """
         collection = []
 

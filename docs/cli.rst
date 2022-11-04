@@ -4,6 +4,12 @@
 Command line
 ============
 
+
+.. admonition:: Todo
+
+    This misses documentation coverage for ``purge`` and ``requirements`` commands.
+
+
 Usage
 -----
 

@@ -9,3 +9,5 @@ Install package in your environment: ::
     pip install project-composer
 
 For development usage see :ref:`install_development`.
+
+For configuration and usage see the next chapters.

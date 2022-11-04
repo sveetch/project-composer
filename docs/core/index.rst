@@ -4,12 +4,18 @@
 Application core
 ================
 
-.. toctree::
-   :maxdepth: 1
 
-   exceptions.rst
-   logger.rst
-   marker.rst
-   importer.rst
+.. admonition:: Todo
+
+    Not all core stuff is exposed here, it misses ``processors``, ``app_storage``,
+    ``manifest`` and ``utils`` modules.
+
+    Also not all docstring are very well structured or complete.
+
+
+.. toctree::
+   :maxdepth: 2
+
    compose.rst
    collector.rst
+   miscellaneous.rst

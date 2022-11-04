@@ -4,6 +4,13 @@
 History
 =======
 
+Version 0.6.1 - Unreleased
+--------------------------
+
+A minor version without any features or changes, it was just about starting
+to improve documentation and release it to *Read the documentation* site.
+
+
 Version 0.6.0 - 2022/11/02
 --------------------------
 
