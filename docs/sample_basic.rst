@@ -8,6 +8,10 @@ To demonstrate the composition usage we will create a dummy project which should
 able to collect various messages from project applications and print them out in the
 expected order.
 
+The final result of this tutorial can be found in its own source repository
+`composer-sveetch-python <https://github.com/sveetch/composer-sveetch-python>`_.
+
+
 Starting project
 ****************
 
@@ -21,6 +25,7 @@ First create the project directory where to work: ::
     virtualenv -p python3 .venv
     source .venv/bin/activate
     pip install project-composer
+
 
 Creating project manifest
 *************************
@@ -51,6 +56,7 @@ Open your editor and create a file ``pyproject.toml`` with following content: ::
 
 For this sample we just focus on the required parameters.
 
+
 Create application repository
 *****************************
 
@@ -72,6 +78,7 @@ Finally you will end with the following structure: ::
         └── messages.py
 
 Now enter in the ``application_repository`` directory to create your applications.
+
 
 The 'foo' application
 ---------------------
@@ -122,6 +129,7 @@ content collector because finally the composer just care about collection, your
 final collector will just be a class composed from application classes that you will be
 free to use how you need.
 
+
 The 'bar' application
 ---------------------
 
@@ -161,6 +169,7 @@ Then we will create the messager part at ``bar/messages.py``: ::
 
 This is alike the ``foo`` messager part except it only define a single messager.
 
+
 The 'ping' application
 ----------------------
 
@@ -193,6 +202,7 @@ Then we will create the messager part at ``ping/messages.py``: ::
 
             return messages
 
+
 Composition usage
 *****************
 
@@ -213,6 +223,7 @@ modules: ::
 
     from project_composer.compose import Composer
     from project_composer.processors import ClassProcessor
+
 
 Messager
 --------
@@ -248,6 +259,7 @@ a empty list that messager classes will fill each one after ones.
 Its ``get_messages()`` method it just a shortand to format the message list. Finally
 we just want to output a line starting with ``Hello`` followed by a single message for
 each message.
+
 
 Message processor
 -----------------
@@ -291,6 +303,7 @@ As you can see in this example the only thing to implement is the ``get_module_p
 method which build the right Python path to search application part modules. Here we
 are looking for a ``messages`` module in applications, so for our sample repository it
 will match ``foo.messages``, ``bar.messages`` and ``ping.messages`` paths.
+
 
 Use composed class
 ------------------
@@ -385,6 +398,7 @@ Running the script should now output every messages in the right order: ::
     - Hello Foo second
     - Hello Bar
     - Hello Ping
+
 
 Conclusion
 **********
