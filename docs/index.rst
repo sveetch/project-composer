@@ -9,14 +9,14 @@
 Project composer
 ================
 
-This is a Python composer for modular projects.
+A convenient system to structure and compose applications from a modular project.
 
-Basically, you give it a project manifest that will be uses to organize your various
+Basically, you give it a project manifest that will be used to organize your various
 project parts. Parts can be classes, text files or you can implement another part
 kind.
 
 
-Dependancies
+Dependencies
 ************
 
 * `Python`_>=3.8;
@@ -40,6 +40,9 @@ User’s Guide
    :maxdepth: 2
 
    overview.rst
+   manifest_reference.rst
+   composer_reference.rst
+   processors_reference.rst
    install.rst
    sample_basic.rst
    cli.rst

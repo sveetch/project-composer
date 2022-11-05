@@ -1,8 +1,8 @@
 .. _intro_core_index:
 
-================
-Application core
-================
+========
+Core API
+========
 
 
 .. admonition:: Todo

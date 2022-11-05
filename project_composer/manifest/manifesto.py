@@ -12,7 +12,7 @@ from .plugins import RequirementsConfig
 
 class Manifest(BaseConfig):
     """
-    Manifest model.
+    The manifest model.
 
     Manifest fields are given as keyword arguments.
 

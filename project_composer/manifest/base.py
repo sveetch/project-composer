@@ -9,8 +9,7 @@ class BaseConfig:
     Configuration class abstract.
 
     Attributes:
-        _FIELDS (list): List of payload attribute names. Only those attributes will
-            be available to dump.
+        _FIELDS (list): Required list of enabled configuration fields.
     """
     _FIELDS = []
 

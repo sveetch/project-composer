@@ -50,28 +50,6 @@ class Composer(LoggerBase):
             for proc in processors
         }
 
-    def call_processor(self, name, method, **kwargs):
-        """
-        Return loaded manifest object.
-
-        Arguments:
-            name (string): Processor name in registry.
-            method (string): Processor method to execute.
-            **kwargs: Keyword arguments to pass to method if any.
-
-        Returns:
-            object: Content depend from Processor method returns.
-        """
-        if name not in self.processors:
-            msg = "Given processor name is not registered from composer: {}"
-            raise ComposerError(msg.format(name))
-
-        if not hasattr(self.processors[name], method):
-            msg = "Processor '{proc}' don't have any method named '{method}'"
-            raise ComposerError(msg.format(proc=name, method=method))
-
-        return getattr(self.processors[name], method)(**kwargs)
-
     def get_manifest(self, manifest):
         """
         Return loaded manifest object.
@@ -247,6 +225,28 @@ class Composer(LoggerBase):
 
         return None
 
+    def call_processor(self, name, method, **kwargs):
+        """
+        Execute a processor method.
+
+        Arguments:
+            name (string): Processor name in registry.
+            method (string): Processor method to execute.
+            **kwargs: Keyword arguments to pass to method if any.
+
+        Returns:
+            object: Content type depend from what processor method returns.
+        """
+        if name not in self.processors:
+            msg = "Given processor name is not registered from composer: {}"
+            raise ComposerError(msg.format(name))
+
+        if not hasattr(self.processors[name], method):
+            msg = "Processor '{proc}' don't have any method named '{method}'"
+            raise ComposerError(msg.format(proc=name, method=method))
+
+        return getattr(self.processors[name], method)(**kwargs)
+
     def resolve_collection(self, lazy=True):
         """
         Resolve collection with AppStore.
@@ -278,3 +278,5 @@ class Composer(LoggerBase):
                 collection,
                 no_ordering=self.manifest.no_ordering
             )
+
+        return collection

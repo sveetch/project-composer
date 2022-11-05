@@ -49,8 +49,7 @@ Open your editor and create a file ``pyproject.toml`` with following content: ::
     ]
     repository = "application_repository"
 
-For this sample we just focus on the required parameters. For true, the name is not
-really required from composer but it is indeed from ``pyproject.toml`` standard.
+For this sample we just focus on the required parameters.
 
 Create application repository
 *****************************
@@ -390,9 +389,9 @@ Running the script should now output every messages in the right order: ::
 Conclusion
 **********
 
-Because Project composer want to be flexible so there is no real shortand to perform
+Because Project composer want to be flexible there is no real shortand to perform
 composition in a single line and you will need a little dozen to achieve it.
 
-But there is no magic behind this and you should be able to integrate everywhere.
+But there is no magic behind this and you should be able to integrate it everywhere.
 
 Finally this sample is pretty basic and did not mention some advanced features.
