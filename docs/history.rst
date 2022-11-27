@@ -7,24 +7,11 @@ History
 Version 0.7.0 - Unreleased
 --------------------------
 
-* TODO: Fix RTD build, pin python build to the right one, currently rtd return error: ::
-
-    Configuration error:
-    There is a programmable error in your configuration file:
-
-    Traceback (most recent call last):
-    File "/home/docs/checkouts/readthedocs.org/user_builds/project-composer/envs/latest/lib/python3.6/site-packages/sphinx/config.py", line 350, in eval_config_file
-        exec(code, namespace)
-    File "/home/docs/checkouts/readthedocs.org/user_builds/project-composer/checkouts/latest/docs/conf.py", line 15, in <module>
-        from project_composer import __version__ as project_composer_version
-    File "/home/docs/checkouts/readthedocs.org/user_builds/project-composer/envs/latest/lib/python3.6/site-packages/project_composer/__init__.py", line 2, in <module>
-        from importlib.metadata import version
-    ModuleNotFoundError: No module named 'importlib.metadata'
-
 * Improve documentation and release it to *Read the documentation* site;
 * Added new "check" method to composer and processors to display output debugging about
   project composition;
 * Moved all Django related stuff to contrib.django;
+* Fix RTD configuration to use Python3.8 to fix building;
 
 
 Version 0.6.0 - 2022/11/02
