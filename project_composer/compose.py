@@ -1,6 +1,5 @@
 import sys
 import inspect
-import json
 from pathlib import Path
 
 from .app_storage import AppStore
@@ -312,7 +311,6 @@ class Composer(LoggerBase):
         printer("👷 Checking composer")
         printer()
 
-        manifest = self.manifest.to_dict()
         printer("📄 Manifest")
         printer("T", "Name: {}".format(self.manifest.name))
         printer("T", "Repository: {}".format(self.manifest.repository))

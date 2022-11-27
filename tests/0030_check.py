@@ -1,7 +1,5 @@
 import logging
 
-import pytest
-
 from project_composer.compose import Composer
 from project_composer.processors import TextContentProcessor
 from project_composer.contrib.django.processors import (

@@ -17,5 +17,5 @@ Core API
    :maxdepth: 2
 
    compose.rst
-   collector.rst
    miscellaneous.rst
+   django.rst

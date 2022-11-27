@@ -115,16 +115,12 @@ class TreePrinter:
         if pattern:
             for item in pattern.upper():
                 if item == "T":
-                    #├.─.─.
                     output += self.TEE_CHAR + line_char
                 elif item == "I":
-                    #│. . .
                     output += self.PIPE_CHAR + (" " * len(self.LINE_CHAR))
                 elif item == "O":
-                    # . . .
                     output += self.VOID_CHAR + (" " * len(self.LINE_CHAR))
                 elif item == "X":
-                    #└.─.─.
                     output += self.ELBOW_CHAR + line_char
 
         return output

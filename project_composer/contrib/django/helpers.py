@@ -1,7 +1,3 @@
-from pathlib import Path
-
-from ...compose import Composer
-
 
 def project_settings(composer, base_classes=None, name=None):
     """

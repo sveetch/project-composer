@@ -22,8 +22,8 @@ Version 0.7.0 - Unreleased
     ModuleNotFoundError: No module named 'importlib.metadata'
 
 * Improve documentation and release it to *Read the documentation* site;
-* ONDOING: Added new "check" method to composer and processors to display output
-  debugging about project composition;
+* Added new "check" method to composer and processors to display output debugging about
+  project composition;
 * Moved all Django related stuff to contrib.django;
 
 
