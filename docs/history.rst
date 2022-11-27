@@ -7,11 +7,13 @@ History
 Version 0.7.0 - Unreleased
 --------------------------
 
-* Improve documentation and release it to *Read the documentation* site;
+* Improved documentation and release it to *Read the documentation* site;
 * Added new "check" method to composer and processors to display output debugging about
   project composition;
 * Moved all Django related stuff to contrib.django;
-* Fix RTD configuration to use Python3.8 to fix building;
+* Fixed RTD configuration to use Python3.8 to fix building;
+* Changed ``Composer.find_app_module`` so it only emits ``log.debug`` instead of
+  ``log.warning`` when it does not find a module;
 
 
 Version 0.6.0 - 2022/11/02

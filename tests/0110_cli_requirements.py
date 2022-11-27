@@ -4,7 +4,6 @@
     settings and CLI arguments, these tests also make global coverage against CLI and
     its manifest usage.
 """
-import logging
 import shutil
 import sys
 from pathlib import Path
@@ -15,14 +14,13 @@ from click.testing import CliRunner
 
 from freezegun import freeze_time
 
-from project_composer import __pkgname__
 from project_composer.cli.entrypoint import cli_frontend
 # from project_composer.utils.tests import debug_invoke
 from project_composer.manifest import Manifest
 from project_composer.compose import Composer
 
 
-def test_requirements_manifest_opt_fail(caplog):
+def test_requirements_manifest_opt_fail():
     """
     Command require at least the manifest option and its default value should fail when
     there is not expect manifest file in current working directory
@@ -85,13 +83,7 @@ def test_requirements_basic(pytester, caplog, tmp_path, settings, basic_structur
             "ping-requirements"
         ]
 
-        assert caplog.record_tuples == [
-            (
-                __pkgname__,
-                logging.WARNING,
-                "Composer is unable to find module: basic_structure.nope"
-            ),
-        ]
+        assert caplog.record_tuples == []
 
 
 def mocked_composer_set_syspaths(pytester_instance):
@@ -178,13 +170,7 @@ def test_requirements_full(monkeypatch, pytester, caplog, tmp_path, settings,
             "ping-requirements"
         ]
 
-        assert caplog.record_tuples == [
-            (
-                __pkgname__,
-                logging.WARNING,
-                "Composer is unable to find module: basic_structure.nope"
-            ),
-        ]
+        assert caplog.record_tuples == []
 
 
 @freeze_time("2012-10-15 10:00:00")
@@ -267,10 +253,4 @@ def test_requirements_override(monkeypatch, pytester, caplog, tmp_path, settings
             "ping-source"
         ]
 
-        assert caplog.record_tuples == [
-            (
-                __pkgname__,
-                logging.WARNING,
-                "Composer is unable to find module: new_repository.nope"
-            ),
-        ]
+        assert caplog.record_tuples == []

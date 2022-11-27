@@ -129,7 +129,7 @@ class Composer(LoggerBase):
                 klass=self.__class__.__name__,
                 path=name,
             )
-            self.log.warning(msg)
+            self.log.debug(msg)
             return None
         else:
             return module

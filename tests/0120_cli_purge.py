@@ -63,11 +63,6 @@ def test_purge_commit(pytester, caplog, tmp_path, settings, basic_structure):
         assert caplog.record_tuples == [
             (
                 __pkgname__,
-                logging.WARNING,
-                "Composer is unable to find module: basic_structure.nope"
-            ),
-            (
-                __pkgname__,
                 logging.INFO,
                 "PurgeProcessor is removing application: {}/pong".format(structure),
             ),
@@ -189,11 +184,6 @@ def test_purge_export(pytester, caplog, tmp_path, settings, basic_structure):
         ]
 
         assert caplog.record_tuples == [
-            (
-                __pkgname__,
-                logging.WARNING,
-                "Composer is unable to find module: basic_structure.nope"
-            ),
             (
                 __pkgname__,
                 logging.INFO,
