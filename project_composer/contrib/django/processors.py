@@ -1,4 +1,4 @@
-from .classes import ClassProcessor
+from ...processors import ClassProcessor
 
 
 class DjangoSettingsProcessor(ClassProcessor):

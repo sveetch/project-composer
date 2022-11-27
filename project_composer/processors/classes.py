@@ -43,3 +43,41 @@ class ClassProcessor(ComposerProcessor):
                 _mod_names.update([item.__name__ for item in mods])
 
         return mods
+
+    def check(self, printer=print):
+        """
+        Debugging check what this processor should find or match.
+
+        Keyword Arguments:
+            printer (callable): A callable to use to output debugging informations.
+                Default to builtin function ``print`` but it won't be very pretty,
+                we recommend to use ``utils.tree_printer.TreePrinter`` to benefit from
+                the tree alike display. Note than composer will give ``TreePrinter`` as
+                its default behavior.
+        """
+        printer()
+        printer("🧵 Processor '{}'".format(self.__class__.__name__))
+
+        app_last = len(self.composer.apps)
+        for i, node in enumerate(self.composer.apps, start=1):
+            printer(
+                "X" if (i == app_last) else "T",
+                node.name
+            )
+            path = self.get_module_path(node.name)
+            module = self.composer.find_app_module(path)
+
+            if module:
+                klasses = self.composer._get_elligible_module_classes(path, module)
+                klass_last = len(klasses)
+                for k, item in enumerate(klasses, start=1):
+                    printer(
+                        (
+                            "O" if (i == app_last) else "I"
+                        ) + (
+                            "X" if (k == klass_last) else "T"
+                        ),
+                        item.__name__
+                    )
+            else:
+                pass

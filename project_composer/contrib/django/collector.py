@@ -1,4 +1,4 @@
-from .logger import LoggerBase
+from ...logger import LoggerBase
 
 
 class ApplicationUrlCollector(LoggerBase):
@@ -20,8 +20,9 @@ class ApplicationUrlCollector(LoggerBase):
         """
         return urlpatterns
 
-    def collect(self, urlpatterns):
+    def collect(self, urlpatterns=None):
         self.log.debug("Application urls collector processing")
+        urlpatterns = urlpatterns or []
         patterns = self.load_urlpatterns(urlpatterns)
 
         return patterns

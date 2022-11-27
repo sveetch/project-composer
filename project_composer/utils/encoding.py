@@ -8,6 +8,12 @@ from ..app_storage import AppNode
 class ExtendedJsonEncoder(json.JSONEncoder):
     """
     Additional opiniated support for more basic object types.
+
+    Sample usage: ::
+
+        import json
+        json.dumps({}, indent=4, cls=ExtendedJsonEncoder)
+
     """
     def default(self, obj):
         # Support for pathlib.Path to a string

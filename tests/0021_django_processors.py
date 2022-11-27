@@ -3,12 +3,15 @@ import logging
 import pytest
 
 from project_composer.compose import Composer
-from project_composer.processors import DjangoSettingsProcessor, DjangoUrlsProcessor
+from project_composer.contrib.django.processors import (
+    DjangoSettingsProcessor, DjangoUrlsProcessor
+)
 
 
 def test_processor_django_basic(caplog, pytester, basic_structure):
     """
-    Content text processor should find enabled classes as expected.
+    Django classes processor should find url and settings classes as expected for
+    basic structure.
     """
     caplog.set_level(logging.DEBUG)
 
@@ -117,7 +120,10 @@ def test_processor_django_basic(caplog, pytester, basic_structure):
 def test_processor_django_advanced(caplog, pytester, advanced_structure, lazy,
                                    expected, json_debug):
     """
-    Content text processor should find enabled classes as expected.
+    Django classes processor should find url and settings classes as expected
+    for advanced structure.
+
+    Here the logs are not review but instead it matter about the lazy resolver mode.
     """
     caplog.set_level(logging.DEBUG)
 

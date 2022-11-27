@@ -34,3 +34,9 @@ class ComposerProcessor:
             returns just the module name.
         """
         return self.composer.get_application_base_module_path(name)
+
+    def check(self, printer=print):
+        """
+        Empty debugging check to implement on processors.
+        """
+        return []

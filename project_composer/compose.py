@@ -1,11 +1,14 @@
 import sys
 import inspect
+import json
+from pathlib import Path
 
 from .app_storage import AppStore
 from .exceptions import ComposerError
 from .importer import import_module
 from .logger import LoggerBase
 from .manifest import Manifest
+from .utils.tree_printer import TreePrinter
 
 
 class Composer(LoggerBase):
@@ -195,12 +198,13 @@ class Composer(LoggerBase):
 
     def _scan_app_module(self, name):
         """
+        Load an application module to get its options.
 
         Arguments:
-            name (string):
+            path (string): The Python path to a module to check for.
 
         Returns:
-            dict:
+            dict: Application payload (name, dependencies and push_end options).
         """
         path = self.get_module_path(name)
 
@@ -213,7 +217,10 @@ class Composer(LoggerBase):
             )
             self.log.debug(msg)
 
-            payload = {"name": name}
+            payload = {
+                "name": name,
+                "filepath": module.__file__
+            }
 
             if hasattr(module, "DEPENDENCIES"):
                 payload["dependencies"] = getattr(module, "DEPENDENCIES")
@@ -280,3 +287,91 @@ class Composer(LoggerBase):
             )
 
         return collection
+
+    def check(self, lazy=True, printer=None):
+        """
+        Output some informations about given manifest, app resolving and processors.
+
+        It is strongly recommended that every checking is directly outputted. It means
+        you should not build a list of messages to output at the end, instead each job
+        should directly output what it has checked.
+
+        This is to ensure the debugging won't hide what have been done before a
+        critical error. Remember this method should be almost safe since it is for
+        debugging.
+
+        Keyword Arguments:
+            lazy (boolean): Wheither to use the lazy mode or not with composer
+                resolver.
+            printer (callable): A callable to use to output debugging informations.
+                Default to builtin function ``utils.tree_printer.TreePrinter`` to
+                benefit from the tree alike display.
+        """
+        printer = printer or TreePrinter(printable=True)
+
+        printer("👷 Checking composer")
+        printer()
+
+        manifest = self.manifest.to_dict()
+        printer("📄 Manifest")
+        printer("T", "Name: {}".format(self.manifest.name))
+        printer("T", "Repository: {}".format(self.manifest.repository))
+        printer("X", "Collection:")
+        if self.manifest.collection:
+            last = len(self.manifest.collection)
+            for i, item in enumerate(self.manifest.collection, start=1):
+                printer(
+                    "OX" if (i == last) else "OT",
+                    item,
+                )
+
+        # Scan repository
+        printer()
+        printer("🌐 Repository directory")
+        repository_mod = self.find_app_module(self.manifest.repository)
+        if repository_mod:
+            repository_dirpath = Path(repository_mod.__file__).parents[0]
+
+            printer("X", repository_dirpath, yes_or_no=repository_dirpath.exists())
+
+            last = len(self.manifest.collection)
+            for i, item in enumerate(self.manifest.collection, start=1):
+                app_dirpath = repository_dirpath / item
+                printer(
+                    "OX" if (i == last) else "OT",
+                    app_dirpath,
+                    yes_or_no=app_dirpath.exists(),
+                )
+        else:
+            printer("X", "Unable to find repository directory")
+
+        self.resolve_collection(lazy=lazy)
+
+        printer()
+        printer("🗃️ Resolved applications")
+        if self.apps:
+            last = len(self.apps)
+            for i, app in enumerate(self.apps, start=1):
+                printer(
+                    "X" if (i == last) else "T",
+                    app,
+                )
+                # Push end option
+                printer(
+                    "OT" if (i == last) else "IT",
+                    "Push end: {}".format(app.push_end),
+                )
+                # Dependencies
+                dep_msg = "No dependency"
+                if app.dependency_names:
+                    dep_msg = "Dependencies: {}".format(", ".join(app.dependency_names))
+                printer(
+                    "OX" if (i == last) else "IX",
+                    dep_msg,
+                )
+        else:
+            printer("X", "Unable to find any applications")
+
+        # Call for processors check
+        for name, proc in self.processors.items():
+            proc.check(printer=printer)

@@ -106,3 +106,60 @@ class TextContentProcessor(ComposerProcessor):
         destination.write_text(output)
 
         return destination
+
+    def check(self, printer=print):
+        """
+        Debugging check what this processor should find or match.
+        """
+        printer()
+        printer("🧵 Processor '{}'".format(self.__class__.__name__))
+
+        app_last = len(self.composer.apps)
+        for i, node in enumerate(self.composer.apps, start=1):
+            # Try to find application module
+            module_path = self.composer.get_module_path(node.name)
+            module = self.composer.find_app_module(module_path)
+
+            # Display app label name
+            printer(
+                "X" if (i == app_last) else "T",
+                node.name,
+            )
+
+            # Try to find app module file to get its path
+            if module and getattr(module, "__file__", None):
+                # Resolve expected text content file path inside module
+                source_path = (
+                    Path(module.__file__).parents[0].resolve() /
+                    self.composer.manifest.requirements.source_filename
+                )
+
+                # Try to find a requirement file
+                if source_path.exists():
+                    content = source_path.read_text()
+                    # Lists package, omits possible commentaries
+                    pkgs = [
+                        pkg
+                        for pkg in content.strip().splitlines()
+                        if not pkg.startswith("#")
+                    ]
+                    pkg_last = len(pkgs)
+                    # Display found package lines
+                    for p, pkg in enumerate(pkgs, start=1):
+                        printer(
+                            (
+                                "O" if (i == app_last) else "I"
+                            ) + (
+                                "X" if (p == pkg_last) else "T"
+                            ),
+                            pkg,
+                        )
+                # There was no requirement file
+                else:
+                    printer(
+                        "OX" if (i == app_last) else "IX",
+                        "No requirement file",
+                        yes_or_no=False,
+                    )
+
+        return

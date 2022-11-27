@@ -75,6 +75,8 @@ introduction
     A string to add before everything (possible template and all requirements) which
     accept a pattern ``{creation_date}`` where to put the file creation date.
 
+    If you don't want an introduction, set this to ``false`` or an empty string.
+
     On default this is: ::
 
         # This file is automatically overwritten by composer, DO NOT EDIT IT.\n
