@@ -19,8 +19,8 @@ class Composer(LoggerBase):
         manifest (string or pathlib.Path or dict or Manifest): The Manifest source to
             load. It can be either:
 
-            * A Manifest object, it will just returned as it without any validation,
-              you are responsible of its correctness;
+            * A Manifest object, it will just be returned as it without any validation.
+              You are responsible of its correctness;
             * A string for the file path to load in JSON or TOML format;
             * A Path object to the file to load in JSON or TOML format;
             * A Dictionnary which respect the manifest structure;

@@ -87,6 +87,17 @@ docs:
 	cd docs && make html
 .PHONY: docs
 
+diagrams:
+	@echo ""
+	@echo "==== Build diagrams ===="
+	@echo ""
+	$(VENV_PATH)/bin/python diags/django.py
+	$(VENV_PATH)/bin/python diags/icons.py
+	$(VENV_PATH)/bin/python diags/processors.py
+	$(VENV_PATH)/bin/python diags/resolver.py
+	$(VENV_PATH)/bin/python diags/workflow.py
+.PHONY: diagrams
+
 livedocs:
 	@echo ""
 	@echo "==== Watching documentation sources ===="
@@ -98,7 +109,7 @@ flake:
 	@echo ""
 	@echo "==== Flake ===="
 	@echo ""
-	$(FLAKE) --statistics --show-source $(APPLICATION_NAME) tests
+	$(FLAKE) --statistics --show-source $(APPLICATION_NAME) tests diags
 .PHONY: flake
 
 test:

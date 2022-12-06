@@ -28,6 +28,7 @@ coverage.xml
 # Temp files
 *~
 .~lock*
+/var/
 
 # Swap files
 *.sw[po]

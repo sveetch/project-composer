@@ -94,16 +94,18 @@ this: ::
     with builtin Python classes and text content files processors or on your own for
     anything else.
 
-    Not any part is required from application, an application may not have a
-    settings file or any other part, the composer will warns about it but won't break.
+    Not any part is required from application so an application may not have a
+    settings file or any other part, the composer won't break.
 
     However any Python part must be a valid module since it is imported.
 
+Benefits
+--------
 
-The benefits in the application repository is that it can be maintained once, shared to
-each new project and everything is ready to work.
+The application repository can be maintained once and shared to each new project and
+everything is ready to work.
 
-Also this is a good way to structure a project.
+Also this is a good way to structure a project with a proper separation of concerns.
 
 
 Involved composer classes path
@@ -124,8 +126,8 @@ when using composer: ::
     └── Processors
 
 Composer
-    The class which you will use to open a manifest, define some processors and execute
-    them.
+    The class you will use to open a manifest, define some processors, execute them
+    and make parts compositions.
 Manifest
     The loaded manifest where belong composition configuration.
 BaseConfig
@@ -143,7 +145,7 @@ AppStore
 AppNode
     The class to represent an application in the store.
 Processors
-    A processor expose some methods to perform jobs on application part. A processor
+    A processor expose some methods to perform jobs on an application part. A processor
     should always be dedicated to a specific part.
 
 .. admonition:: In resume
@@ -152,3 +154,7 @@ Processors
     #. Use the collection to scan repository applications for their defined dependencies;
     #. Then resolve the application order implied by dependencies and return the
        application list in the right order.
+
+    In common usage, you will just have to make a manifest file, load it with
+    composer and enable some processors. You won't really have to care about other
+    classes like ``AppNode``, ``AppStore``, etc..

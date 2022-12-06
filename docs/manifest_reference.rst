@@ -139,7 +139,7 @@ The TOML format structure is : ::
     The one from ``tool.project_composer`` section is the first one checked and the
     second one from ``project`` is used as a fallback. This is because the
     ``pyproject.toml`` format require the ``project.name`` option so you should already
-    have a project name but you are free to use the one if needed.
+    have a project name but you are able to define a custom one if needed.
 
 
 Manifest as Python dictionnary
