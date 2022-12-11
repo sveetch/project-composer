@@ -14,6 +14,15 @@ def import_module(name, package=None):
     can be given to search in. If module is not in current directory, you will have to
     add its parent path in sys.path. Also relative module path will work only for
     inside a package.
+
+    Arguments:
+        name (string): A valid Python path to the module.
+
+    Keyword Arguments:
+        package (string): A package name to exclusively search in package tree.
+
+    Returns
+        object: Found module object.
     """
     absolute_name = importlib.util.resolve_name(name, package)
 

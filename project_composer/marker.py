@@ -1,13 +1,18 @@
 
 class EnabledApplicationMarker:
     """
-    Empty class to mark another class as enabled to load for composition.
+    Application elligibility marker.
 
-    This class won't never ever introduce anything else than marker attribute
-    ``_ENABLED_COMPOSABLE_APPLICATION`` since the class may be herited by any kind of
-    class we don't want to pollute.
+    An application part class must inherit from this to be marked as enabled to load
+    for composition.
 
-    Only purpose of attribute ``_ENABLED_COMPOSABLE_APPLICATION`` is to mark it for
-    inspection from composer, don't change it.
+    This class implements an attribute ``_ENABLED_COMPOSABLE_APPLICATION`` used to
+    validate elligibility and nothing else.
+
+    Only purpose of attribute ``_ENABLED_COMPOSABLE_APPLICATION`` is to mark it as
+    elligible for composer inspection, don't change it.
+
+    You may however, reproduce elligibility yourself in your class with including this
+    attribute, its value is not important except it must not be ``None``.
     """
     _ENABLED_COMPOSABLE_APPLICATION = True

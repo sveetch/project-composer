@@ -7,7 +7,7 @@ from ..app_storage import AppNode
 
 class ExtendedJsonEncoder(json.JSONEncoder):
     """
-    Additional opiniated support for more basic object types.
+    Extended JSON encoder to support more basic and internal object types.
 
     Sample usage: ::
 

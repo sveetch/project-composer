@@ -14,7 +14,6 @@ class BaseField:
     Attributes:
         _DEFAULT_VALUE (object): Default value to use when no one is explicitely given
             from arguments. It must fit to the field type. By default this is ``None``.
-        TYPE (object): Python type object.
     """
     _DEFAULT_VALUE = None
     TYPE = object

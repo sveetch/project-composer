@@ -8,6 +8,10 @@ Version 0.7.0 - Unreleased
 --------------------------
 
 * Improved documentation and release it to *Read the documentation* site;
+* Built some diagrams for documentation with
+  `diagrams package <https://github.com/mingrammer/diagrams>`_, a distinct makefile
+  command ``diagrams`` has been added to build them into documentation static file
+  directory;
 * Added new "check" method to composer and processors to display output debugging about
   project composition;
 * Moved all Django related stuff to contrib.django;

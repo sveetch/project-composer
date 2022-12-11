@@ -1,3 +1,4 @@
+from __init__ import get_conf, adjust_image
 from icons import AppNode, Application, Manifest, Resolver
 
 
@@ -6,13 +7,10 @@ if __name__ == "__main__":
 
     from diagrams import Cluster, Diagram
 
-    # Use the script filename without Python extension
-    STATIC_DIR = Path("var/diags/")
-    filename = STATIC_DIR / Path(__file__).stem
+    conf = get_conf(Path(__file__).stem)
+    output_filepath = conf.pop("output_filepath")
 
-    # Output diagram as a PNG file with direction 'Top to Bottom'.
-    with Diagram("", filename=filename, show=False, direction="TB"):
-
+    with Diagram("", **conf) as diag:
         manifest = Manifest("Manifest")
         resolver = Resolver("Resolver")
 
@@ -30,9 +28,9 @@ if __name__ == "__main__":
         repository >> manifest
 
         with Cluster("Application store"):
-            appnode_3 = AppNode("AppNode 3")
-            appnode_2 = AppNode("AppNode 2")
             appnode_1 = AppNode("AppNode 1")
+            appnode_2 = AppNode("AppNode 2")
+            appnode_3 = AppNode("AppNode 3")
 
             appstore = [
                 appnode_1,
@@ -43,4 +41,5 @@ if __name__ == "__main__":
         manifest >> resolver
         resolver >> appstore
 
-    print("Built diagram at: {}".format(filename.resolve()))
+    adjust_image(output_filepath.resolve())
+    print("Built diagram at: {}".format(output_filepath.resolve()))

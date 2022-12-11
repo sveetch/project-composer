@@ -11,6 +11,13 @@ Class marker
     :members:
     :show-inheritance:
 
+Helpers
+*******
+
+.. automodule:: project_composer.helpers
+    :members:
+    :show-inheritance:
+
 Logging
 *******
 

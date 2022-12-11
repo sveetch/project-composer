@@ -205,7 +205,7 @@ class AppStore:
 
         Returns:
             list: List of AppNode object or payload (dict) respectively depending flat
-                mode is False or True.
+            mode is False or True.
         """
         resolved = []
 

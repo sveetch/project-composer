@@ -1,5 +1,6 @@
 from diagrams.programming.framework import Django
 
+from __init__ import get_conf, adjust_image
 from icons import Composer, Manifest, PackageInstaller, Processor, ProjectPart
 
 
@@ -8,12 +9,10 @@ if __name__ == "__main__":
 
     from diagrams import Cluster, Diagram, Edge
 
-    # Use the script filename without Python extension
-    STATIC_DIR = Path("var/diags/")
-    filename = STATIC_DIR / Path(__file__).stem
+    conf = get_conf(Path(__file__).stem)
+    output_filepath = conf.pop("output_filepath")
 
-    # Output diagram as a PNG file with direction 'Top to Bottom'.
-    with Diagram("", filename=filename, show=False, direction="TB"):
+    with Diagram("", **conf):
         manifest = Manifest("Manifest")
         composer = Composer("Composer")
 
@@ -56,4 +55,5 @@ if __name__ == "__main__":
         composer >> Edge(color="darkgreen") >> urls_proc
         composer >> Edge(color="chocolate2") >> requirements_proc
 
-    print("Built diagram at: {}".format(filename.resolve()))
+    adjust_image(output_filepath.resolve())
+    print("Built diagram at: {}".format(output_filepath.resolve()))

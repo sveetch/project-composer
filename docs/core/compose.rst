@@ -7,3 +7,4 @@ Composer
 .. automodule:: project_composer.compose
     :members:
     :show-inheritance:
+    :private-members:

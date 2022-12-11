@@ -40,10 +40,9 @@ User’s Guide
    :maxdepth: 2
 
    overview.rst
-   manifest_reference.rst
-   composer_reference.rst
-   processors_reference.rst
    install.rst
+   manifest_reference.rst
+   workflow.rst
    sample_basic.rst
    cli.rst
    core/index.rst

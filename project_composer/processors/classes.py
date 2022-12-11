@@ -4,7 +4,7 @@ from .base import ComposerProcessor
 class ClassProcessor(ComposerProcessor):
     """
     Class composer find all existing classes for enabled application modules and that
-    match criterias from ``_is_elligible_class``.
+    match criterias from ``Composer._is_elligible_class``.
     """
     def export(self, **kwargs):
         """
@@ -52,8 +52,8 @@ class ClassProcessor(ComposerProcessor):
             printer (callable): A callable to use to output debugging informations.
                 Default to builtin function ``print`` but it won't be very pretty,
                 we recommend to use ``utils.tree_printer.TreePrinter`` to benefit from
-                the tree alike display. Note than composer will give ``TreePrinter`` as
-                its default behavior.
+                the tree alike display. Note than composer already give ``TreePrinter``
+                to this argument when calling this method.
         """
         printer()
         printer("🧵 Processor '{}'".format(self.__class__.__name__))

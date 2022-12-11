@@ -8,6 +8,9 @@ Install package in your environment: ::
 
     pip install project-composer
 
-For development usage see :ref:`install_development`.
+Then you will need a manifest to configure composer behaviors and to implement it in
+your project. You will find more detail in the next chapters.
 
-For configuration and usage see the next chapters.
+.. Note::
+
+    For development usage see :ref:`install_development`.

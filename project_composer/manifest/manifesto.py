@@ -16,16 +16,23 @@ class Manifest(BaseConfig):
 
     Manifest fields are given as keyword arguments.
 
-    Fields:
-        name (string): The manifest title name.
-        collection (list): A list of application module names for enabled application.
-        repository (string): A Python path where to search for enabled application
-            modules.
-        syspaths (list): A list of Path object to load in sys.path by Composer.
-        requirements (dict): A dictionnary of items to load in ``RequirementsConfig``
-            for specific requirements composer. In fact this is used by
-            ``TextContentComposer`` but requirements is actually its unique
-            implementation.
+    Fields are:
+
+    name (string)
+        The manifest title name.
+
+    collection (list)
+        A list of application module names for enabled application.
+    repository (string)
+        A Python path where to search for enabled application
+        modules.
+    syspaths (list)
+        A list of Path object to load in sys.path by Composer.
+    requirements (dict)
+        A dictionnary of items to load in ``RequirementsConfig``
+        for specific requirements composer. In fact this is used by
+        ``TextContentComposer`` but requirements is actually its unique
+        implementation.
 
     Attributes:
         name (string): The manifest title name.

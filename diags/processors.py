@@ -1,3 +1,4 @@
+from __init__ import get_conf, adjust_image
 from icons import (
     ApplicationStore, ApplicationRepository, Application,
     Resolver, Processor, ProcessorCaller, Project,
@@ -9,20 +10,21 @@ if __name__ == "__main__":
 
     from diagrams import Cluster, Diagram
 
-    # Use the script filename without Python extension
-    STATIC_DIR = Path("var/diags/")
-    filename = STATIC_DIR / Path(__file__).stem
+    conf = get_conf(Path(__file__).stem)
+    output_filepath = conf.pop("output_filepath")
 
-    # Output diagram as a PNG file with direction 'Top to Bottom'.
-    with Diagram("", filename=filename, show=False, direction="TB"):
-
-        appstore = ApplicationStore("Application store")
+    with Diagram("", **conf):
         repository = ApplicationRepository("Application repository")
-        resolver = Resolver("Resolver")
+
+        with Cluster("Composer"):
+            appstore = ApplicationStore("Application store")
+            resolver = Resolver("Resolver")
+            proc_caller = ProcessorCaller("Processor caller")
+
+            resolver >> appstore
+            appstore >> proc_caller
 
         repository >> resolver
-        resolver >> appstore
-        proc_caller = ProcessorCaller("Processor caller")
 
         with Cluster("Processors"):
             proc_b = Processor("Processor B")
@@ -33,7 +35,6 @@ if __name__ == "__main__":
                 proc_b,
             ]
 
-            appstore >> proc_caller
             proc_caller >> processors
 
             with Cluster("Part B"):
@@ -62,4 +63,5 @@ if __name__ == "__main__":
         part_a >> project
         part_b >> project
 
-    print("Built diagram at: {}".format(filename.resolve()))
+    adjust_image(output_filepath.resolve())
+    print("Built diagram at: {}".format(output_filepath.resolve()))

@@ -24,7 +24,7 @@ class BaseConfig:
 
         Although it's a classmethod, it is safe to call it as an instance method.
 
-        Keywords:
+        Arguments:
             **kwargs: Fields datas.
         """
         if inspect.isclass(cls):
@@ -63,7 +63,7 @@ class BaseConfig:
         ``BaseConfig.validate_attributes()`` must be runned before to ensure field
         values are valid.
 
-        Keywords:
+        Arguments:
             **kwargs: Keyword arguments for field values to set as object attribute
                 value.
         """

@@ -61,7 +61,7 @@ Create application repository
 *****************************
 
 As you can see from the manifest, we need a repository directory named
-``application_repository`` which will contains application directories ``bar``, ``foo``
+``application_repository`` that will contains application directories ``bar``, ``foo``
 and ``ping``.
 
 Finally you will end with the following structure: ::
@@ -85,7 +85,7 @@ The 'foo' application
 
 This will be the lowest level application because it does not depend on any other one.
 
-So since it does not have any dependency, just create an empty file at
+Since it does not have any dependency just create an empty file at
 ``foo/__init__.py``.
 
 Then we will create the messager part at ``foo/messages.py``: ::

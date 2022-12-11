@@ -24,6 +24,7 @@ help:
 	@echo
 	@echo "  docs                -- to build documentation"
 	@echo "  livedocs            -- to run livereload server to rebuild documentation on source changes"
+	@echo "  diagrams            -- to build diagrams and deploy them in documentation"
 	@echo
 	@echo "  flake               -- to launch Flake8 checking"
 	@echo "  test                -- to launch base test suite using Pytest"

@@ -1,10 +1,10 @@
-.. _intro_core_collector:
+.. _intro_core_django:
 
 ==============
 Django contrib
 ==============
 
-Here you can find all stuff related to usage with Django Framework.
+Here you can find all stuff related for usage with Django Framework.
 
 
 .. automodule:: project_composer.contrib.django.processors

@@ -63,12 +63,12 @@ if __name__ == "__main__":
 
     from diagrams import Cluster, Diagram
 
-    # Use the script filename without Python extension
-    STATIC_DIR = Path("var/diags/")
-    filename = STATIC_DIR / Path(__file__).stem
+    from __init__ import get_conf, adjust_image
 
-    # Output diagram as a PNG file with direction 'Top to Bottom'.
-    with Diagram("", filename=filename, show=False, direction="TB"):
+    conf = get_conf(Path(__file__).stem)
+    output_filepath = conf.pop("output_filepath")
+
+    with Diagram("", **conf):
         with Cluster("GCP set"):
             with Cluster("Sources of truth"):
                 manifest = Manifest("Manifest")
@@ -92,4 +92,5 @@ if __name__ == "__main__":
                 packager_installer = PackageInstaller("Package installer")
                 project = Project("Project")
 
-    print("Built diagram at: {}".format(filename.resolve()))
+    adjust_image(output_filepath.resolve())
+    print("Built diagram at: {}".format(output_filepath.resolve()))

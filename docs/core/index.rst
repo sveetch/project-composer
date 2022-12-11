@@ -1,21 +1,17 @@
 .. _intro_core_index:
 
-========
-Core API
-========
-
-
-.. admonition:: Todo
-
-    Not all core stuff is exposed here, it misses ``processors``, ``app_storage``,
-    ``manifest`` and ``utils`` modules.
-
-    Also not all docstring are very well structured or complete.
+==========
+References
+==========
 
 
 .. toctree::
    :maxdepth: 2
 
+   manifest.rst
    compose.rst
+   app_storage.rst
+   processors.rst
+   utilities.rst
    miscellaneous.rst
    django.rst

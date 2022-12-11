@@ -9,6 +9,15 @@ class AppNode:
     Keyword Arguments:
         push_end (boolean): Application parameter to describe that it should be pushed
             to end of the ordered application list.
+
+    Attributes:
+        name (string): The application name comes from its directory name in
+            application repository.
+        dependencies (list): List of AppNode objects. Only filled once ``AppStore``
+            resolving has been done.
+        dependency_names (list): List of string names. It is mostly used in
+            ``AppStore`` preparation until it has done resolving.
+        push_end (boolean): "Push end" mode value.
     """
     def __init__(self, name, push_end=False):
         self.name = name
@@ -27,18 +36,24 @@ class AppNode:
 
     def add_dependency(self, node):
         """
+        Add a dependency object to the object registry ``AppNode.dependencies``.
+
+        A dependency which already exists in registry is not added twice.
 
         Arguments:
-            node (AppNode):
+            node (AppNode): Dependency object to add.
         """
         if node.name not in [item.name for item in self.dependencies]:
             self.dependencies.append(node)
 
     def add_dependency_name(self, name):
         """
+        Add a dependency name to the name registry ``AppNode.dependency_names``.
+
+        A dependency name which already exists in registry is not added twice.
 
         Arguments:
-            name (string):
+            node (string): Dependency name to add.
         """
         if name not in self.dependency_names:
             self.dependency_names.append(name)
@@ -52,7 +67,7 @@ class AppNode:
                 names (string) instead of AppNode objects.
 
         Returns:
-            dict:
+            dict: Application payload including dependencies as ``AppNode`` objects.
         """
         return {
             "name": self.name,
@@ -68,6 +83,6 @@ class AppNode:
         Shortcut to ``to_dict`` with flat mode enforced.
 
         Returns:
-            dict:
+            dict: Application payload including dependencies as string name.
         """
         return self.to_dict(flat=True)
