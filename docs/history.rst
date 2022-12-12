@@ -4,7 +4,7 @@
 History
 =======
 
-Version 0.7.0 - Unreleased
+Version 0.7.0 - 2022/12/12
 --------------------------
 
 * Improved documentation and release it to *Read the documentation* site;
