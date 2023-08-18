@@ -10,6 +10,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import datetime
 
 # Get the module version
 from project_composer import __version__ as project_composer_version
@@ -17,8 +18,9 @@ from project_composer import __version__ as project_composer_version
 
 # -- Project information -----------------------------------------------------
 
+now = datetime.date.today()
 project = 'project-composer'
-copyright = '2022, David Thenon'
+copyright = '2022-{}, David Thenon'.format(now.year)
 author = 'David Thenon'
 
 # The short X.Y version

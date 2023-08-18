@@ -4,6 +4,17 @@
 History
 =======
 
+Version 0.7.1 - Unreleased
+--------------------------
+
+* Updated Makefile to use ANSI color on task titles;
+* Fixed package setup to not install Tox with dev extra requirements;
+* Limited Tox suites to minimal and maximal supported Python version to speed up
+  quality validation;
+* Pinned ``sphinx-rtd-theme`` to ``==1.1.0`` to avoid an
+  `issue which enforce install of old 0.5.x release <https://stackoverflow.com/questions/67542699/readthedocs-sphinx-not-rendering-bullet-list-from-rst-file/71069918#71069918>`_;
+
+
 Version 0.7.0 - 2022/12/12
 --------------------------
 

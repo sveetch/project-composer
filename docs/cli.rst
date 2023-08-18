@@ -9,7 +9,7 @@ Usage
 
 You may reach the tool either directly: ::
 
-        .venv/bin/project_composer
+    .venv/bin/project_composer
 
 Or more simplier after environment have been activated: ::
 
