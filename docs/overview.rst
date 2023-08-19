@@ -151,8 +151,8 @@ Processors
 .. admonition:: In resume
 
     #. Composer open and read given manifest;
-    #. Use the collection to scan repository applications for their defined dependencies;
-    #. Then resolve the application order implied by dependencies and return the
+    #. Use the collection to scan application repository for their defined dependencies;
+    #. Resolve the application order implied by dependencies and return the
        application list in the right order.
 
     In common usage, you will just have to make a manifest file, load it with

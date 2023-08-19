@@ -4,7 +4,7 @@
 History
 =======
 
-Version 0.7.1 - Unreleased
+Version 0.7.1 - 2023/08/19
 --------------------------
 
 * Updated Makefile to use ANSI color on task titles;

@@ -1,4 +1,4 @@
-# Frozen requirement versions from '0.7.1rc2' installation
+# Frozen requirement versions from '0.7.1' installation
 click==8.1.7
 colorlog==6.7.0
 diagrams==0.23.3

@@ -7,9 +7,9 @@
 Project composer
 ================
 
-This is a Python composer for modular projects.
+A convenient system to structure and compose applications from a modular project.
 
-Basically, you give it a project manifest that will be uses to organize your various
+Basically, you give it a project manifest that will be used to organize your various
 project parts. Parts can be classes, text files or you can implement another part
 kind.
 
