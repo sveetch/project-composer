@@ -1,1 +1,1 @@
-project-composer
+project-composer[doc]
