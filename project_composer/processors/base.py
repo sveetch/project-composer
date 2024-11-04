@@ -37,6 +37,6 @@ class ComposerProcessor:
 
     def check(self, printer=print):
         """
-        Empty debugging check to implement on processors.
+        Empty debugging check to implement into concrete processors.
         """
         return []

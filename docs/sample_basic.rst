@@ -4,9 +4,9 @@
 Basic sample
 ============
 
-To demonstrate the composition usage we will create a dummy project which should be
-able to collect various messages from project applications and print them out in the
-expected order.
+To demonstrate the composition usage we will create a dummy project that will be
+able to collect various messages from project applications and print them out with a
+defined order.
 
 The final result of this tutorial can be found in its own source repository
 `composer-sveetch-python <https://github.com/sveetch/composer-sveetch-python>`_.
@@ -337,7 +337,7 @@ Running the script should return the collection list as defined from manifest, i
 order have not changed: ::
 
     $python hello.py
-    collection: ['ping', 'bar', 'foo']
+    collection: ["ping", "bar", "foo"]
 
 Now add the following code to the script to check for the resolved application list
 ordered after dependency hierarchy: ::
@@ -360,7 +360,7 @@ processor, add the following to the script: ::
 Running the script should now output the class list ordered after the resolved
 application order: ::
 
-    _classes: ['FooFirstMessage', 'FooSecondMessage', 'BarMessage', 'PingMessage']
+    _classes: ["FooFirstMessage", "FooSecondMessage", "BarMessage", "PingMessage"]
 
 Enough of inspection, we will finish this script. First we build the final messager
 class: ::

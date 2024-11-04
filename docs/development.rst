@@ -82,6 +82,10 @@ Then go on ``http://localhost:8002/`` or your server machine IP with port 8002.
 Note that you need to build the documentation at least once before using
 ``livedocs``.
 
+.. Note::
+    The makefile task ``diagrams`` used to build diagrams in documentation requires
+    the Graphviz library to be installed on your system.
+
 Releasing
 ---------
 
