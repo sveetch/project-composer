@@ -3,8 +3,8 @@
 Changelog
 =========
 
-Development
-***********
+Version 0.8.0 - 2026/04/01
+**************************
 
 This is a basic release to update Python support.
 
