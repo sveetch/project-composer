@@ -96,8 +96,8 @@ def test_purge_commit(pytester, caplog, settings, basic_structure):
         "Composer found application at: basic_structure.ping",
         "Composer found application at: basic_structure.foo",
         "PurgeProcessor is removing application: {}/bar".format(structure),
-        "PurgeProcessor is removing application: {}/pong".format(structure),
-        "PurgeProcessor is removing application: {}/invalid".format(structure),
         "PurgeProcessor is removing application: {}/dummy".format(structure),
         "PurgeProcessor is removing application: {}/empty".format(structure),
+        "PurgeProcessor is removing application: {}/invalid".format(structure),
+        "PurgeProcessor is removing application: {}/pong".format(structure),
     ]

@@ -93,6 +93,7 @@ def requirements_command(*args, **parameters):
     """
     logger = logging.getLogger(__pkgname__)
 
+    print("📝 parameters[\"manifest\"]:", parameters["manifest"])
     # Load manifest settings
     logger.debug("Using manifest: {}".format(parameters["manifest"]))
     manifest = Manifest.load(parameters["manifest"])

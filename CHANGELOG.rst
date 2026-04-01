@@ -3,10 +3,23 @@
 Changelog
 =========
 
+Development
+***********
+
+This is a basic release to update Python support.
+
+* Added support for Python 3.12 and 3.13;
+* Added basic ``pyproject.toml`` to package for some behaviors with modern Pip and
+  Setuptools;
+* Fixed some tests to stabilize order of some results with different Python versions;
+* Fixed some CLI tests failing because of introduction of ``pyproject.toml`` to
+  package;
+
+
 Version 0.7.2 - 2024/11/04
 **************************
 
-**This is only a minor release to enhance development environment**
+This is only a minor release to enhance development environment.
 
 * Added support for Python 3.11;
 * Added minimal version for all requirements;

@@ -6,19 +6,23 @@ from click.testing import CliRunner
 
 from project_composer import __pkgname__
 from project_composer.cli.entrypoint import cli_frontend
-from project_composer.utils.tests import debug_invoke
+# from project_composer.utils.tests import debug_invoke
 
 
-def test_purge_manifest_opt_fail(caplog):
+def test_purge_manifest_opt_fail(tmp_path):
     """
     Command require at least the manifest option and its default value should fail when
     there is not expect manifest file in current working directory.
     """
     runner = CliRunner()
 
-    result = runner.invoke(cli_frontend, ["purge"])
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        result = runner.invoke(cli_frontend, ["purge"])
 
-    assert "Error: Invalid value for '--manifest'" in result.output
+    msg = (
+        "Error: Invalid value for '--manifest': File 'pyproject.toml' does not exist."
+    )
+    assert msg in result.output
 
     assert result.exit_code == 2
 
@@ -64,7 +68,12 @@ def test_purge_commit(pytester, caplog, tmp_path, settings, basic_structure):
             (
                 __pkgname__,
                 logging.INFO,
-                "PurgeProcessor is removing application: {}/pong".format(structure),
+                "PurgeProcessor is removing application: {}/dummy".format(structure),
+            ),
+            (
+                __pkgname__,
+                logging.INFO,
+                "PurgeProcessor is removing application: {}/empty".format(structure),
             ),
             (
                 __pkgname__,
@@ -76,12 +85,7 @@ def test_purge_commit(pytester, caplog, tmp_path, settings, basic_structure):
             (
                 __pkgname__,
                 logging.INFO,
-                "PurgeProcessor is removing application: {}/dummy".format(structure),
-            ),
-            (
-                __pkgname__,
-                logging.INFO,
-                "PurgeProcessor is removing application: {}/empty".format(structure),
+                "PurgeProcessor is removing application: {}/pong".format(structure),
             ),
         ]
 
@@ -115,7 +119,7 @@ def test_purge_commit_empty(pytester, caplog, tmp_path, settings, basic_structur
             "--commit",
         ])
 
-        debug_invoke(result, caplog)
+        # debug_invoke(result, caplog)
 
         assert result.exit_code == 0
 
@@ -168,7 +172,7 @@ def test_purge_export(pytester, caplog, tmp_path, settings, basic_structure):
             "--repository", "basic_structure",
         ])
 
-        debug_invoke(result, caplog)
+        # debug_invoke(result, caplog)
 
         assert result.exit_code == 0
 
@@ -187,17 +191,17 @@ def test_purge_export(pytester, caplog, tmp_path, settings, basic_structure):
             (
                 __pkgname__,
                 logging.INFO,
-                "This application module would be removed: {}/pong".format(structure),
-            ),
-            (
-                __pkgname__,
-                logging.INFO,
                 "This application module would be removed: {}/dummy".format(structure),
             ),
             (
                 __pkgname__,
                 logging.INFO,
                 "This application module would be removed: {}/empty".format(structure),
+            ),
+            (
+                __pkgname__,
+                logging.INFO,
+                "This application module would be removed: {}/pong".format(structure),
             ),
         ]
 
@@ -230,7 +234,7 @@ def test_purge_export_empty(pytester, caplog, tmp_path, settings, basic_structur
             "--repository", "basic_structure",
         ])
 
-        debug_invoke(result, caplog)
+        # debug_invoke(result, caplog)
 
         assert result.exit_code == 0
 

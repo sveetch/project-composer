@@ -15,21 +15,25 @@ from click.testing import CliRunner
 from freezegun import freeze_time
 
 from project_composer.cli.entrypoint import cli_frontend
-# from project_composer.utils.tests import debug_invoke
 from project_composer.manifest import Manifest
 from project_composer.compose import Composer
+# from project_composer.utils.tests import debug_invoke
 
 
-def test_requirements_manifest_opt_fail():
+def test_requirements_manifest_opt_fail(tmp_path):
     """
     Command require at least the manifest option and its default value should fail when
     there is not expect manifest file in current working directory
     """
     runner = CliRunner()
 
-    result = runner.invoke(cli_frontend, ["requirements"])
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        result = runner.invoke(cli_frontend, ["requirements"])
 
-    assert "Error: Invalid value for '--manifest'" in result.output
+    msg = (
+        "Error: Invalid value for '--manifest': File 'pyproject.toml' does not exist."
+    )
+    assert msg in result.output
 
     assert result.exit_code == 2
 

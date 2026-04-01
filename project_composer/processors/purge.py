@@ -40,11 +40,11 @@ class PurgeProcessor(ComposerProcessor):
         ]
 
         # Filter out the application module directories that are enabled from manifest
-        return [
+        return sorted([
             item
             for item in appdirs
             if item.name not in [a.name for a in self.composer.apps]
-        ]
+        ])
 
     def commit(self):
         """
